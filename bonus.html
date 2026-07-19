@@ -91,8 +91,9 @@
           <div class="glass-panel widget">
             <h3>bubble bay weather</h3>
             <div class="weather-orb" aria-hidden="true"></div>
-            <p class="weather-line">21°C, light breeze</p>
+            <p class="weather-line" id="wxLine">21°C, light breeze</p>
             <p class="weather-line">forecast: bubbles all week</p>
+            <p class="weather-line muted">live from ljubljana. the bay is metaphorical</p>
           </div>
 
           <div class="glass-panel widget">
@@ -136,8 +137,9 @@
 
           <div class="glass-panel widget reveal" id="ghCard">
             <h3>github</h3>
-            <p class="status-line"><img id="ghAvatar" class="gh-avatar" alt="" width="34" height="34"><a href="https://github.com/BiksY01" target="_blank" rel="noopener noreferrer">@BiksY01</a></p>
-            <p class="weather-line"><strong id="ghRepos">–</strong> repos · <strong id="ghFollowers">–</strong> followers</p>
+            <p class="status-line"><img id="ghAvatar" class="gh-avatar" alt="" width="34" height="34"><a href="https://github.com/BiksY01" target="_blank" rel="noopener noreferrer">@BiksY01</a> <span class="muted" id="ghSince"></span></p>
+            <p class="weather-line"><strong id="ghRepos">–</strong> repos · <strong id="ghFollowers">–</strong> followers · <strong id="ghStars">–</strong> stars</p>
+            <p class="weather-line muted" id="ghLangs">&nbsp;</p>
             <ul class="gh-list" id="ghList"><li class="muted">loading…</li></ul>
             <a class="btn btn-green" href="https://github.com/BiksY01?tab=repositories" target="_blank" rel="noopener noreferrer">see all →</a>
           </div>
@@ -146,7 +148,9 @@
             <h3>server status</h3>
             <p class="status-line"><span class="status-dot" id="statusDot"></span><span id="statusText">checking…</span></p>
             <p class="weather-line">visits so far: <strong id="statVisits">–</strong></p>
+            <p class="weather-line">today: <strong id="statToday">–</strong></p>
             <p class="weather-line">here right now: <strong id="statOnline">–</strong></p>
+            <p class="weather-line muted">unique-ish visitors. the bots got evicted lol</p>
           </div>
 
         </div>

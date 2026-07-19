@@ -99,7 +99,7 @@ a:focus-visible, button:focus-visible, .tab:focus-visible, input:focus-visible{
   color: var(--aero-purple-deep);
   text-decoration: none;
   padding: 10px 20px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.7));
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.9);
@@ -287,7 +287,7 @@ body::after{
   gap: 18px;
   background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.55));
   border: 1px solid var(--glass-border);
-  border-radius: 999px;
+  border-radius: 14px;
   padding: 7px 9px 7px 20px;
   box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.9);
   -webkit-backdrop-filter: blur(10px);
@@ -331,7 +331,7 @@ body::after{
   text-decoration: none;
   color: var(--text-mid);
   padding: 9px 15px;
-  border-radius: 999px;
+  border-radius: 9px;
   background: rgba(255,255,255,0.4);
   border: 1px solid transparent;
   transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
@@ -360,9 +360,14 @@ body::after{
 .tab:active{ transform: translateY(0) scale(0.96); }
 .tab.active{
   color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+/* the active tab itself stays transparent — the glider pill underneath IS
+   the highlight, so you actually see it glide between channels instead of
+   the color snapping. if js never armed the glider, paint the tab directly. */
+.tabs:not(:has(.tab-glider.ready)) .tab.active{
   background: linear-gradient(135deg, #5cc2f0, var(--aero-purple));
   box-shadow: 0 6px 16px rgba(139,109,240,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
 }
 .tab-extras{
   background: linear-gradient(135deg, #ffd3e8, #d9c9ff);
@@ -374,15 +379,28 @@ body::after{
 .tab-glider{
   position: absolute;
   top: 0; left: 0;
-  border-radius: 999px;
+  border-radius: 9px;
   background: linear-gradient(135deg, #5cc2f0, var(--aero-purple));
-  box-shadow: 0 6px 16px rgba(139,109,240,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
+  box-shadow: 0 8px 20px rgba(139,109,240,0.55), 0 0 18px rgba(92,194,240,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
   z-index: -1;
   opacity: 0;
-  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), width 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  /* springy overshoot so the glide reads as a real slide, not a fade */
+  transition:
+    transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1),
+    width 0.55s cubic-bezier(0.34, 1.4, 0.64, 1),
+    height 0.55s cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 0.2s ease;
 }
 .tab-glider.ready{ opacity: 1; }
 .lite .tab-glider{ transition: none; }
+
+/* mid-width nav: tighten the tabs so all ten fit one row instead of
+   stranding "Extras" alone on its own line */
+@media (max-width: 1120px){
+  .tabs{ justify-content: center; }
+  .tab{ font-size: 0.8rem; padding: 8px 11px; }
+  .tabs{ gap: 4px; }
+}
 
 /* ---------- 5. layout ---------- */
 main{ position: relative; z-index: 1; }
@@ -433,7 +451,7 @@ main{ position: relative; z-index: 1; }
   --my: 15%;
   background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.35));
   border: 1px solid var(--glass-border);
-  border-radius: 26px;
+  border-radius: 12px;
   padding: 26px 30px;
   box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 0 0 1px var(--panel-edge);
   -webkit-backdrop-filter: blur(8px);
@@ -559,7 +577,7 @@ main{ position: relative; z-index: 1; }
   color: #fff;
   padding: 12px 24px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 9px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -575,7 +593,7 @@ main{ position: relative; z-index: 1; }
   top: 0; left: 0; right: 0;
   height: 55%;
   background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0));
-  border-radius: 999px 999px 50% 50% / 999px 999px 100% 100%;
+  border-radius: 9px 9px 50% 50% / 9px 9px 100% 100%;
   pointer-events: none;
 }
 .btn::before{
@@ -667,16 +685,30 @@ main{ position: relative; z-index: 1; }
   gap: 20px;
 }
 .about-card p{ line-height: 1.7; }
-.stat-card{ display: flex; flex-direction: column; justify-content: center; gap: 18px; }
-.stat{ text-align: center; }
-.stat-num{
-  display: block;
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  color: var(--aero-purple-deep);
-  font-weight: 600;
+/* the aero id card — replaced the old stat block (big-number stat grids
+   scream template; a glossy contact card actually says something) */
+.id-card{ display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.id-head{ display: flex; align-items: center; gap: 12px; }
+.id-orb{
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: radial-gradient(circle at 32% 28%, #e6f7ff, #66c6f0 45%, #1f7ec2);
+  box-shadow: inset 0 -5px 9px rgba(31, 58, 102, 0.25), 0 3px 8px rgba(30, 90, 110, 0.25);
 }
-.stat-label{ font-size: 0.82rem; color: var(--text-mid); }
+.id-name{ display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; color: var(--text-dark); }
+.id-sub{ display: block; font-size: 0.8rem; color: var(--text-mid); }
+.id-rows{ list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.id-rows li{ display: flex; gap: 10px; align-items: baseline; font-size: 0.92rem; }
+.id-rows li > span:first-child{ color: var(--text-mid); font-size: 0.78rem; min-width: 84px; flex-shrink: 0; }
+.id-stamp{
+  align-self: flex-start;
+  transform: rotate(-2.5deg);
+  border: 1.5px dashed var(--aero-blue);
+  color: var(--aero-blue);
+  border-radius: 8px;
+  padding: 3px 10px;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+}
 
 code{
   background: rgba(139,109,240,0.14);
@@ -688,7 +720,11 @@ code{
 
 /* ---------- 9. kernel ---------- */
 .feature-list{ line-height: 1.85; padding-left: 0; list-style: none; }
-.feature-list li{ display: flex; align-items: center; gap: 10px; }
+/* not flex: flex items can't wrap mid-sentence, so long lines with code
+   chips used to shoot out of the card on phones. the arrow hangs in a
+   gutter instead and the text flows like text. */
+.feature-list li{ position: relative; padding-left: 32px; }
+.feature-list .li-arrow{ position: absolute; left: 0; top: 0.5em; }
 .li-arrow{ width: 22px; height: 14px; flex-shrink: 0; }
 
 .setup-grid{
@@ -705,7 +741,7 @@ code{
   padding: 14px 14px 0;
   background: linear-gradient(160deg, rgba(255,255,255,0.9), rgba(180,220,255,0.55));
   border: 1px solid var(--glass-border);
-  border-radius: 22px;
+  border-radius: 12px;
   box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .monitor-screen{
@@ -758,7 +794,7 @@ code{
   margin: -8px -12px 12px;
   padding: 9px 14px;
   background: rgba(20, 30, 45, 0.9);
-  border-radius: 14px 14px 0 0;
+  border-radius: 10px 10px 0 0;
 }
 .dot{ width: 11px; height: 11px; border-radius: 50%; }
 .dot-red{ background: #ff5f57; }
@@ -774,7 +810,7 @@ code{
   margin: -12px -12px -8px;
   padding: 16px 18px 20px;
   background: rgba(12, 20, 32, 0.95);
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 10px 10px;
   color: #d6f3e3;
   font-size: 0.8rem;
   line-height: 1.85;
@@ -801,12 +837,16 @@ code{
   transform: translateY(-6px) scale(1.02);
   box-shadow: 0 16px 34px rgba(43,168,224,0.28);
 }
-.project-icon{ font-size: 1.7rem; margin-bottom: 8px; }
+.project-icon{ margin-bottom: 8px; }
+.project-icon svg{
+  width: 34px; height: 34px; display: block;
+  filter: drop-shadow(0 2px 3px rgba(30, 90, 110, 0.28));
+}
 .tags{ display: flex; gap: 8px; margin-top: 12px; }
 .tags span{
   font-size: 0.72rem;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: rgba(43,168,224,0.14);
   color: var(--aero-blue);
   font-weight: 700;
@@ -864,7 +904,7 @@ code{
   z-index: 1;
   background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(200,228,252,0.75) 55%, rgba(255,255,255,0.85));
   border: 1px solid var(--glass-border);
-  border-radius: 28px;
+  border-radius: 12px;
   padding: 18px 20px 20px;
   box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -8px 18px rgba(120,170,220,0.25);
 }
@@ -904,7 +944,7 @@ code{
   overflow: hidden;
   background: linear-gradient(180deg, #123049 0%, #0a1c2e 100%);
   border: 2px solid rgba(255,255,255,0.35);
-  border-radius: 14px;
+  border-radius: 10px;
   box-shadow: inset 0 4px 14px rgba(0,0,0,0.55), inset 0 -2px 8px rgba(43,168,224,0.25);
   padding: 12px 14px 10px;
   display: flex;
@@ -1032,7 +1072,7 @@ code{
   font-family: var(--font-display);
   font-size: 0.84rem;
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--glass-border);
   background: rgba(255,255,255,0.55);
   color: var(--text-mid);
@@ -1067,7 +1107,7 @@ code{
   appearance: none;
   width: 150px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: 4px;
   background: linear-gradient(90deg, #8bc7ee, #8b6df0);
   outline: none;
   cursor: pointer;
@@ -1221,7 +1261,7 @@ code{
 }
 .shrine-grid a{
   display: block;
-  border-radius: 14px;
+  border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--glass-border);
   box-shadow: 0 6px 16px rgba(30,90,110,0.18);
@@ -1242,7 +1282,7 @@ code{
   position: relative;
   height: 280px;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 10px;
   background: linear-gradient(180deg, rgba(139,199,238,0.3), rgba(214,243,227,0.55));
   border: 1px solid var(--glass-border);
   touch-action: manipulation;
@@ -1299,7 +1339,7 @@ code{
   align-items: center;
   gap: 10px;
   padding: 8px 14px;
-  border-radius: 12px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.42);
   border: 1px solid var(--glass-border);
   font-family: var(--font-display);
@@ -1326,7 +1366,7 @@ code{
   font-family: var(--font-body);
   font-size: 0.95rem;
   padding: 11px 16px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--glass-border);
   background: rgba(255,255,255,0.6);
   color: var(--text-dark);
@@ -1444,7 +1484,7 @@ body.lite::after{ display: none; }
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
-    border-radius: 22px;
+    border-radius: 12px;
     padding: 10px 12px;
     backdrop-filter: none;
   }
@@ -1463,9 +1503,9 @@ body.lite::after{ display: none; }
   .btn-lg{ padding: 15px 26px; font-size: 0.92rem; }
   .scroll-hint{ margin-top: 22px; }
 
-  .glass-panel{ padding: 20px 18px; border-radius: 20px; backdrop-filter: none; }
+  .glass-panel{ padding: 20px 18px; border-radius: 10px; backdrop-filter: none; }
   .section-title{ font-size: clamp(1.3rem, 5.5vw, 1.6rem); }
-  .stat-num{ font-size: 1.25rem; }
+  .id-rows li > span:first-child{ min-width: 72px; }
   .terminal-body{ font-size: 0.7rem; }
   .terminal-topbar{ margin: -4px -6px 10px; }
   .setup-grid{ gap: 18px; }
@@ -1523,11 +1563,11 @@ body.lite::after{ display: none; }
   text-align: center;
   background: rgba(255,255,255,0.5);
   border: 1px solid var(--glass-border);
-  border-radius: 18px;
+  border-radius: 10px;
   padding: 14px 10px;
   box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.8);
 }
-.net-ico{ font-size: 1.5rem; }
+.net-ico{ width: 32px; height: 32px; filter: drop-shadow(0 2px 3px rgba(30, 90, 110, 0.28)); }
 .net-node strong{ font-family: var(--font-display); font-weight: 600; }
 .net-desc{ font-size: 0.78rem; color: var(--text-mid); line-height: 1.4; }
 .net-link{
@@ -1543,7 +1583,7 @@ body.lite::after{ display: none; }
   position: absolute;
   left: 0; right: 0; top: 17px;
   height: 3px;
-  border-radius: 99px;
+  border-radius: 4px;
   background: linear-gradient(90deg, rgba(43,168,224,0.15), rgba(43,168,224,0.65), rgba(43,168,224,0.15));
 }
 /* little packets commuting between the boxes */
@@ -1574,7 +1614,7 @@ body.lite::after{ display: none; }
   background: rgba(255,255,255,0.78);
   border: 1px solid rgba(255,255,255,0.9);
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: 6px;
   box-shadow: 0 2px 6px rgba(30,90,110,0.12);
 }
 .setup-cards{ grid-template-columns: 1fr 1fr; margin-top: 20px; }
@@ -1662,7 +1702,7 @@ body.lite::after{ display: none; }
 /* bonus: wide shrine banner */
 .shrine-wide{
   display: block;
-  border-radius: 14px;
+  border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--glass-border);
   box-shadow: 0 6px 16px rgba(30,90,110,0.18);
@@ -1760,7 +1800,7 @@ body.lite::after{ display: none; }
   width: 100%; height: 120px; display: block;
   background: rgba(255, 255, 255, 0.35);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 8px;
 }
 /* tps / tick / uptime strip under the graph */
 .mc-stats{ display: flex; gap: 10px; flex-wrap: wrap; }
@@ -1771,7 +1811,7 @@ body.lite::after{ display: none; }
   flex-direction: column;
   gap: 2px;
   padding: 8px 12px;
-  border-radius: 12px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.4);
   border: 1px solid var(--glass-border);
 }
@@ -1785,7 +1825,7 @@ body.lite::after{ display: none; }
 .mc-players{ display: flex; flex-wrap: wrap; gap: 10px; }
 .mc-player{
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 6px 14px; border-radius: 999px;
+  padding: 6px 14px; border-radius: 8px;
   background: rgba(255, 255, 255, 0.5);
   border: 1px solid var(--glass-border);
   font-size: 0.9rem; color: var(--text-dark);
@@ -1823,4 +1863,10 @@ img.gh-avatar:not([src]){ display: none; }
 .gh-list li{ font-size: 0.92rem; line-height: 1.3; }
 .gh-list a{ font-weight: 600; }
 .gh-desc{ display: block; opacity: 0.7; font-size: 0.82rem; }
+.gh-meta{ display: block; font-size: 0.78rem; color: var(--text-mid); }
+.gh-dot{
+  display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+  margin-right: 5px; vertical-align: baseline;
+  box-shadow: inset 0 -1px 2px rgba(0,0,0,0.25);
+}
 .muted{ opacity: 0.65; }

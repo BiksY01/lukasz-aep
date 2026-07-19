@@ -16,4 +16,5 @@ _headers
 .deploy.lock
 .deploy.log
 GOAL.md
+PROMPT.md
 .vscode/

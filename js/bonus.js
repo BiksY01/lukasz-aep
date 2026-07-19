@@ -20,6 +20,7 @@
   if (statusDot) {
     const statusText = document.getElementById('statusText');
     const statVisits = document.getElementById('statVisits');
+    const statToday = document.getElementById('statToday');
     const statOnline = document.getElementById('statOnline');
     fetch('/api/stats')
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
@@ -28,6 +29,7 @@
         statusText.textContent = 'online';
         // numbers can be null when kv quota runs dry — keep the dashes then
         if (d.visits != null) statVisits.textContent = d.visits;
+        if (d.today != null && statToday) statToday.textContent = d.today;
         if (d.online != null) statOnline.textContent = d.online;
       })
       .catch(() => {
@@ -209,6 +211,31 @@
   });
 })();
 
+/* ---------- bubble bay weather ----------
+   used to be a made-up 21°C forever. now it's the real ljubljana numbers
+   off open-meteo (no key needed). if the api is shy the static copy stays
+   and nobody notices — the forecast part was never real anyway. */
+(() => {
+  const line = document.getElementById('wxLine');
+  if (!line) return;
+  const WMO = {
+    0: 'clear skies', 1: 'mostly clear', 2: 'a few clouds', 3: 'cloudy',
+    45: 'foggy', 48: 'foggy', 51: 'drizzle', 53: 'drizzle', 55: 'drizzle',
+    61: 'light rain', 63: 'rain', 65: 'proper rain', 71: 'snow', 73: 'snow',
+    75: 'lots of snow', 80: 'showers', 81: 'showers', 82: 'showers',
+    95: 'a thunderstorm', 96: 'a thunderstorm', 99: 'a thunderstorm'
+  };
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=46.05&longitude=14.51&current=temperature_2m,weather_code,wind_speed_10m')
+    .then((r) => r.json())
+    .then((d) => {
+      const c = d && d.current;
+      if (!c || typeof c.temperature_2m !== 'number') return;
+      const wind = c.wind_speed_10m > 20 ? 'actually windy' : c.wind_speed_10m > 8 ? 'light breeze' : 'barely a breeze';
+      line.textContent = `${Math.round(c.temperature_2m)}°C in ljubljana, ${WMO[c.weather_code] || 'weather happening'}, ${wind}`;
+    })
+    .catch(() => {});
+})();
+
 /* ---------- days since last reboot ----------
    not live telemetry, just counting from the date i actually rebooted.
    update REBOOT_AT by hand whenever that happens (rarely, obviously) */
@@ -227,14 +254,31 @@
 })();
 
 /* ---------- github card ----------
-   live repo + follower counts and my latest repos, straight off the public
-   github api (no key, it's all public). only fires once the card scrolls
-   into view so we're not poking the api on every single page load. */
+   live numbers straight off the public github api (no key, it's all public).
+   one repos?per_page=100 call buys everything: total stars, what languages i
+   actually write, and the 4 most recently pushed repos with real metadata.
+   only fires once the card scrolls into view so we're not poking the api on
+   every single page load. everything lands via textContent = no injection. */
 (() => {
   const card = document.getElementById('ghCard');
   if (!card) return;
   const USER = 'BiksY01';
   let done = false;
+
+  // github's own language colors, just the ones likely to show up
+  const LANG_DOT = {
+    JavaScript: '#f1e05a', TypeScript: '#3178c6', Python: '#3572a5',
+    Shell: '#89e051', HTML: '#e34c26', CSS: '#563d7c', C: '#555555',
+    'C++': '#f34b7d', Rust: '#dea584', Go: '#00add8', Lua: '#000080', Java: '#b07219'
+  };
+
+  const ago = (iso) => {
+    const s = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (s < 3600) return Math.max(1, Math.floor(s / 60)) + 'min ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    if (s < 2592000) return Math.floor(s / 86400) + 'd ago';
+    return Math.floor(s / 2592000) + 'mo ago';
+  };
 
   const load = async () => {
     if (done) return; done = true;
@@ -242,24 +286,52 @@
     try {
       const [u, repos] = await Promise.all([
         fetch(`https://api.github.com/users/${USER}`).then((r) => r.json()),
-        fetch(`https://api.github.com/users/${USER}/repos?sort=updated&per_page=3`).then((r) => r.json()),
+        fetch(`https://api.github.com/users/${USER}/repos?per_page=100`).then((r) => r.json()),
       ]);
 
       if (u && typeof u.public_repos === 'number') {
         document.getElementById('ghRepos').textContent = u.public_repos;
         document.getElementById('ghFollowers').textContent = u.followers;
+        const since = document.getElementById('ghSince');
+        if (since && u.created_at) since.textContent = 'since ' + new Date(u.created_at).getFullYear();
         const av = document.getElementById('ghAvatar');
         if (av && u.avatar_url) av.src = u.avatar_url;
       }
 
       if (Array.isArray(repos) && repos.length) {
+        const starsEl = document.getElementById('ghStars');
+        if (starsEl) starsEl.textContent = repos.reduce((n, r) => n + (r.stargazers_count || 0), 0);
+
+        const langCount = {};
+        for (const r of repos) if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1;
+        const top = Object.entries(langCount).sort((a, b) => b[1] - a[1]).slice(0, 3);
+        const langEl = document.getElementById('ghLangs');
+        if (langEl && top.length) langEl.textContent = 'mostly ' + top.map(([l]) => l.toLowerCase()).join(' + ');
+
+        // own repos first, freshest push wins; forks only if there's nothing else
+        let recent = repos.filter((r) => !r.fork);
+        if (!recent.length) recent = repos;
+        recent = recent.sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at)).slice(0, 4);
+
         list.textContent = '';
-        for (const r of repos) {
+        for (const r of recent) {
           const li = document.createElement('li');
           const a = document.createElement('a');
           a.href = r.html_url; a.target = '_blank'; a.rel = 'noopener noreferrer';
           a.textContent = r.name;                 // textContent = no injection
           li.appendChild(a);
+          const meta = document.createElement('span');
+          meta.className = 'gh-meta';
+          if (r.language) {
+            const dot = document.createElement('span');
+            dot.className = 'gh-dot';
+            dot.style.backgroundColor = LANG_DOT[r.language] || '#9aa7c7';
+            meta.appendChild(dot);
+            meta.appendChild(document.createTextNode(r.language.toLowerCase() + ' · '));
+          }
+          if (r.stargazers_count) meta.appendChild(document.createTextNode(r.stargazers_count + ' stars · '));
+          meta.appendChild(document.createTextNode('pushed ' + ago(r.pushed_at)));
+          li.appendChild(meta);
           if (r.description) {
             const d = document.createElement('span');
             d.className = 'gh-desc';
