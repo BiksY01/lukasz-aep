@@ -5,6 +5,10 @@ wii menu vibes, glass on everything.
 
 live: https://lukasz-aep.pages.dev
 
+<img width="1918" height="1078" alt="image" src="https://github.com/user-attachments/assets/f842776d-63f7-4a08-9e95-b0191b585c3c" />
+
+<img width="1920" height="1000" alt="image" src="https://github.com/user-attachments/assets/2d4ac22d-84e6-4b91-b006-dd3aca0eb878" />
+
 ## stuff it does
 - a spinning glass globe and aero panels, all pure css (no faked images, actual gloss)
 - a radio that actually works. it's a css device with real tracks
