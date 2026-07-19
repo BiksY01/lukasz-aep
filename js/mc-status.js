@@ -101,6 +101,12 @@
   // player chips get added/removed with a little pop instead of the whole row
   // being rebuilt every poll (which also killed the flag glyphs mid-render)
   const chips = new Map();
+  function chipSpan(cls, text) {
+    const s = document.createElement('span');
+    if (cls) s.className = cls;
+    s.textContent = text;   // names come off the wire — textContent, always
+    return s;
+  }
   function syncPlayers(players) {
     const incoming = new Map((players || []).map(p => [String(p.name || '?'), p]));
 
@@ -116,11 +122,9 @@
       const chip = document.createElement('span');
       chip.className = 'mc-player enter';
       const flag = flagEmoji(p.country_code);
-      const safe = s => String(s || '').replace(/[<>&]/g, '');
-      chip.innerHTML =
-        (flag ? '<span class="mc-flag">' + flag + '</span>' : '') +
-        '<span>' + safe(name) + '</span>' +
-        (p.country ? '<span class="mc-country">' + safe(p.country) + '</span>' : '');
+      if (flag) chip.appendChild(chipSpan('mc-flag', flag));
+      chip.appendChild(chipSpan('', name));
+      if (p.country) chip.appendChild(chipSpan('mc-country', p.country));
       playersEl.appendChild(chip);
       chips.set(name, chip);
     }
@@ -133,19 +137,25 @@
     }
   }
 
+  // one reset for the three "nothing to show" flavors (unreachable, stale,
+  // clean offline) — the same dashes were pasted in three places before
+  function showDown(msg) {
+    orb.className = 'mc-orb' + (msg === 'offline' ? ' off' : '');
+    state.textContent = msg;
+    count.textContent = '';
+    ramNow.textContent = '–';
+    tpsEl.textContent = msptEl.textContent = uptimeEl.textContent = '–';
+    tpsEl.className = 'mc-stat-val';
+    online = false;
+    targetRam = null;
+  }
+
   function render(data) {
     const cur = data.current;
     const fresh = cur && Date.now() - cur.received_at < STALE_MS;
 
     if (!cur || !fresh) {
-      orb.className = 'mc-orb';
-      state.textContent = "can't reach it right now";
-      count.textContent = '';
-      ramNow.textContent = '–';
-      tpsEl.textContent = msptEl.textContent = uptimeEl.textContent = '–';
-      tpsEl.className = 'mc-stat-val';
-      online = false;
-      targetRam = null;
+      showDown("can't reach it right now");
       syncPlayers([]);
       return;
     }
@@ -166,12 +176,7 @@
       msptEl.textContent = cur.mspt != null ? cur.mspt.toFixed(1) + ' ms' : '–';
       uptimeEl.textContent = fmtUptime(cur.uptime_s);
     } else {
-      orb.className = 'mc-orb off';
-      state.textContent = 'offline';
-      count.textContent = '';
-      ramNow.textContent = '–';
-      tpsEl.textContent = msptEl.textContent = uptimeEl.textContent = '–';
-      tpsEl.className = 'mc-stat-val';
+      showDown('offline');
     }
 
     syncPlayers(cur.online ? cur.players : []);
@@ -184,14 +189,7 @@
       if (!res.ok) throw new Error(res.status);
       render(await res.json());
     } catch (e) {
-      orb.className = 'mc-orb';
-      state.textContent = "can't reach it right now";
-      count.textContent = '';
-      ramNow.textContent = '–';
-      tpsEl.textContent = msptEl.textContent = uptimeEl.textContent = '–';
-      tpsEl.className = 'mc-stat-val';
-      online = false;
-      targetRam = null;
+      showDown("can't reach it right now");
     }
   }
 

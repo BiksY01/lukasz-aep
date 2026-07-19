@@ -8,6 +8,10 @@
    6  glass panels         14  footer & cursor
    7  hero                 15  lite mode
    8  about                16  phone sizes
+   after 16: net diagram, rice corner, mc status,
+   gh card — grew after the responsive blocks, so
+   their phone overrides need media queries BELOW
+   their base rules or the cascade eats them.
    ------------------------------------------------ */
 
 /* ---------- 1. tokens & fonts ---------- */
@@ -374,8 +378,8 @@ body::after{
   color: #6a4fd6;
   font-weight: 600;
 }
-/* sliding "channel select" pill — js moves it to the active tab so the
-   highlight glides between channels instead of snapping. wii menu energy */
+/* sliding "channel select" pill — js keeps it sized to the active tab.
+   wii menu energy */
 .tab-glider{
   position: absolute;
   top: 0; left: 0;
@@ -1223,7 +1227,7 @@ code{
   margin: 4px 0;
 }
 
-/* find me: discord + tiktok */
+/* find me: the button stack */
 .findme{
   display: flex;
   flex-direction: column;
@@ -1453,7 +1457,7 @@ body.lite::after{ display: none; }
 .lite *{ backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 .lite .globe-glow{ display: none; }
 .lite .bubbles span:nth-child(n+3){ display: none; }
-.lite .glass-panel, .lite .card, .lite .project-card, .lite .mc-panel{
+.lite .glass-panel, .lite .project-card, .lite .mc-panel{
   box-shadow: 0 3px 10px rgba(30,90,110,0.12);
 }
 .lite .monitor, .lite .hero-monitor{ filter: none; }
@@ -1635,7 +1639,7 @@ body.lite::after{ display: none; }
     width: 100%;
     padding: 12px 16px;
   }
-  .net-ico{ font-size: 1.5rem; flex-shrink: 0; }
+  .net-ico{ flex-shrink: 0; }
   .net-node strong{ min-width: 78px; }
   .net-desc{ font-size: 0.72rem; }
   .net-link{

@@ -1,9 +1,6 @@
-/* ============================================================
-   Frutiger Aero FM — the site radio.
-   Three real aero tracks stream from assets/audio/, and the
-   last station is a bonus tune synthesized live with the
-   Web Audio API. The EQ bars run off a real analyser node.
-   ============================================================ */
+/* aero fm — the site radio. three real tracks off assets/audio/, plus one
+   station that's pure web audio (i wanted to know if i could). the eq bars
+   run off a real analyser node, no faking. */
 (() => {
   const playBtn = document.getElementById('playBtn');
   if (!playBtn) return;
