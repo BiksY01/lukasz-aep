@@ -162,15 +162,31 @@
 
   try { lbName.value = localStorage.getItem('popName') || ''; } catch (e) {}
 
+  let lbToken = null;  // signed token from the server; required to submit a score
+
   function drawBoard(top) {
-    if (!top || !top.length) { lbList.innerHTML = '<li class="lb-empty">no scores yet — be the first</li>'; return; }
-    lbList.innerHTML = top.map(r =>
-      '<li><span class="lb-name">' + String(r.name).replace(/[<>&]/g, '') + '</span>' +
-      '<span class="lb-score">' + (Number(r.score) || 0) + '</span></li>'
-    ).join('');
+    lbList.textContent = '';
+    if (!top || !top.length) {
+      const li = document.createElement('li');
+      li.className = 'lb-empty';
+      li.textContent = 'no scores yet — be the first';
+      lbList.appendChild(li);
+      return;
+    }
+    for (const r of top) {
+      const li = document.createElement('li');
+      const n = document.createElement('span');
+      n.className = 'lb-name';
+      n.textContent = String(r.name);          // textContent, so a name can never be html
+      const s = document.createElement('span');
+      s.className = 'lb-score';
+      s.textContent = Number(r.score) || 0;
+      li.append(n, s);
+      lbList.appendChild(li);
+    }
   }
 
-  fetch('/api/scores').then(r => r.json()).then(d => drawBoard(d.top)).catch(() => {
+  fetch('/api/scores').then(r => r.json()).then(d => { lbToken = d.token; drawBoard(d.top); }).catch(() => {
     lbList.innerHTML = '<li class="lb-empty">leaderboard offline</li>';
   });
 
@@ -184,7 +200,7 @@
     fetch('/api/scores', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ name, score: best })
+      body: JSON.stringify({ name, score: best, token: lbToken })
     })
       .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(d => { drawBoard(d.top); lbSubmit.textContent = 'saved ✓'; })
