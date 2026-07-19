@@ -209,3 +209,63 @@
   tick();
   setInterval(tick, 60000);
 })();
+
+/* ---------- github card ----------
+   live repo + follower counts and my latest repos, straight off the public
+   github api (no key, it's all public). only fires once the card scrolls
+   into view so we're not poking the api on every single page load. */
+(() => {
+  const card = document.getElementById('ghCard');
+  if (!card) return;
+  const USER = 'BiksY01';
+  let done = false;
+
+  const load = async () => {
+    if (done) return; done = true;
+    const list = document.getElementById('ghList');
+    try {
+      const [u, repos] = await Promise.all([
+        fetch(`https://api.github.com/users/${USER}`).then((r) => r.json()),
+        fetch(`https://api.github.com/users/${USER}/repos?sort=updated&per_page=3`).then((r) => r.json()),
+      ]);
+
+      if (u && typeof u.public_repos === 'number') {
+        document.getElementById('ghRepos').textContent = u.public_repos;
+        document.getElementById('ghFollowers').textContent = u.followers;
+        const av = document.getElementById('ghAvatar');
+        if (av && u.avatar_url) av.src = u.avatar_url;
+      }
+
+      if (Array.isArray(repos) && repos.length) {
+        list.textContent = '';
+        for (const r of repos) {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = r.html_url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+          a.textContent = r.name;                 // textContent = no injection
+          li.appendChild(a);
+          if (r.description) {
+            const d = document.createElement('span');
+            d.className = 'gh-desc';
+            d.textContent = r.description;
+            li.appendChild(d);
+          }
+          list.appendChild(li);
+        }
+      } else {
+        list.innerHTML = '<li class="muted">repos live over on github →</li>';
+      }
+    } catch (e) {
+      if (list) list.innerHTML = '<li class="muted">github’s being shy, hit “see all”.</li>';
+    }
+  };
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { load(); io.disconnect(); } });
+    }, { rootMargin: '0px 0px 120px 0px' });
+    io.observe(card);
+  } else {
+    load();
+  }
+})();
