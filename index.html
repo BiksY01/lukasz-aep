@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Lukasz.aep — Gentoo tinkerer, kernel compiler, TikTok creator. A Frutiger Aero x Wii Menu style home channel.">
+<meta name="theme-color" content="#a9b6f5">
+<meta name="author" content="Lukasz.aep">
+<title>Lukasz.aep — Home Channel</title>
+<link rel="canonical" href="https://lukasz-aep.pages.dev/">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lukasz.aep">
+<meta property="og:title" content="Lukasz.aep — Home Channel">
+<meta property="og:description" content="Gentoo tinkerer, kernel compiler, TikTok creator. A Frutiger Aero x Wii Menu style home channel.">
+<meta property="og:url" content="https://lukasz-aep.pages.dev/">
+<meta property="og:image" content="https://lukasz-aep.pages.dev/assets/img/mp3-player.webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="900">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Lukasz","alternateName":"Lukasz.aep","url":"https://lukasz-aep.pages.dev/","sameAs":["https://www.tiktok.com/@Lukasz.aep"],"description":"Gentoo tinkerer, kernel compiler, TikTok creator."}</script>
+<link rel="preload" href="assets/fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/img/globe-glass.webp" as="image" type="image/webp" media="(min-width: 701px)">
+<link rel="preload" href="assets/img/globe-glass-sm.webp" as="image" type="image/webp" media="(max-width: 700px)">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#home">skip to content</a>
+
+  <!-- shared SVG defs: Frutiger Aero glossy green arrow -->
+  <svg width="0" height="0" class="visually-hidden-defs" aria-hidden="true">
+    <defs>
+      <linearGradient id="greenArrowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#c8f79a"/>
+        <stop offset="45%" stop-color="#6fd13d"/>
+        <stop offset="100%" stop-color="#2e9c3f"/>
+      </linearGradient>
+      <symbol id="aero-arrow" viewBox="0 0 100 60">
+        <path d="M4,30 L70,30" stroke="url(#greenArrowGrad)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M46,8 L72,30 L46,52" fill="none" stroke="url(#greenArrowGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10,25 L60,25" stroke="rgba(255,255,255,0.65)" stroke-width="4" stroke-linecap="round"/>
+      </symbol>
+      <linearGradient id="wiiHandGrad" x1="0%" y1="0%" x2="60%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#d9e6f2"/>
+      </linearGradient>
+      <symbol id="wii-hand" viewBox="0 0 32 32">
+        <path d="M17,3.2 C19.3,3.2 21.1,5 21.1,7.3 L21.1,9 L21.6,9 C22.9,9 24,10.1 24,11.4 L24,20.6
+                 C24,25.2 20.3,29 15.6,29 C11.4,29 7.9,25.9 7.3,21.8 L6.2,15.2 C5.9,13.6 7,12.1 8.6,11.8
+                 C9.9,11.6 11.2,12.4 11.5,13.7 L11.9,15.4 L11.9,7.3 C11.9,5 13.7,3.2 16,3.2 Z"
+          fill="url(#wiiHandGrad)" stroke="#5b7a99" stroke-width="1" stroke-linejoin="round"/>
+      </symbol>
+      <linearGradient id="pinkHeartGrad" x1="10%" y1="0%" x2="90%" y2="100%">
+        <stop offset="0%" stop-color="#ffe1ec"/>
+        <stop offset="45%" stop-color="#ff6fa5"/>
+        <stop offset="100%" stop-color="#df3d78"/>
+      </linearGradient>
+      <symbol id="aero-heart" viewBox="0 0 24 24">
+        <path d="M12,21.35 L10.55,20.03 C5.4,15.36 2,12.28 2,8.5 C2,5.42 4.42,3 7.5,3 C9.24,3 10.91,3.81 12,5.09 C13.09,3.81 14.76,3 16.5,3 C19.58,3 22,5.42 22,8.5 C22,12.28 18.6,15.36 13.45,20.03 L12,21.35 Z" fill="url(#pinkHeartGrad)"/>
+        <ellipse cx="8.3" cy="7.6" rx="2.3" ry="1.4" fill="rgba(255,255,255,0.75)" transform="rotate(-30 8.3 7.6)"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- custom Wii-pointer style cursor -->
+  <div class="wii-cursor" id="wiiCursor">
+    <svg class="wii-cursor-icon" viewBox="0 0 32 32"><use href="#wii-hand"/></svg>
+  </div>
+
+  <!-- the globe. spin is pure css, phones stay smooth -->
+  <div class="globe-wrap" aria-hidden="true"><div class="globe-bg"></div></div>
+  <div class="globe-glow"></div>
+
+  <!-- floating bubbles -->
+  <div class="bubbles" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- floating hearts -->
+  <div class="hearts" aria-hidden="true">
+    <svg class="heart"><use href="#aero-heart"/></svg>
+    <svg class="heart"><use href="#aero-heart"/></svg>
+    <svg class="heart"><use href="#aero-heart"/></svg>
+    <svg class="heart"><use href="#aero-heart"/></svg>
+    <svg class="heart"><use href="#aero-heart"/></svg>
+    <svg class="heart"><use href="#aero-heart"/></svg>
+  </div>
+
+  <!-- Wii-menu style tab nav -->
+  <header class="wiibar">
+    <div class="wiibar-inner">
+      <a href="#home" class="brand">
+        <span class="brand-orb"></span>
+        <span class="brand-text">Lukasz<span class="brand-dot">.aep</span></span>
+      </a>
+      <nav class="tabs" id="tabs">
+        <a href="#home" class="tab active" data-tab="home">Home</a>
+        <a href="#about" class="tab" data-tab="about">About</a>
+        <a href="#kernel" class="tab" data-tab="kernel">Gentoo Kernel</a>
+        <a href="#projects" class="tab" data-tab="projects">Projects</a>
+        <a href="#setup" class="tab" data-tab="setup">Setup</a>
+        <a href="#server" class="tab" data-tab="server">Server</a>
+        <a href="#playing" class="tab" data-tab="playing">Now Playing</a>
+        <a href="#rice" class="tab" data-tab="rice">Rice</a>
+        <a href="#tiktok" class="tab" data-tab="tiktok">TikTok</a>
+        <a href="/bonus" class="tab tab-extras">Extras</a>
+        <span class="tab-glider" aria-hidden="true"></span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="channel hero">
+      <img src="assets/img/monitor-sm.webp" alt="" class="hero-monitor" width="560" height="723" loading="lazy" decoding="async" aria-hidden="true">
+      <div class="hero-content glass-panel">
+        <div class="wii-remote-glow"></div>
+        <h1 class="chrome-text">lukasz<span class="dim">.aep</span></h1>
+        <p class="subtitle">Gentoo tinkerer &nbsp;•&nbsp; kernel compiler &nbsp;•&nbsp; TikTok creator</p>
+        <div class="cta-row">
+          <a href="https://www.tiktok.com/@Lukasz.aep" target="_blank" rel="noopener noreferrer" class="btn btn-pink">
+            follow on tiktok
+          </a>
+          <a href="#kernel" class="btn btn-blue">
+            my kernel setup
+          </a>
+          <a href="#playing" class="btn btn-green">
+            aero radio
+          </a>
+        </div>
+        <div class="scroll-hint">scroll to spin the globe ↓</div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title"><span class="title-orb"></span>About Me</h2>
+        <div class="card-grid">
+          <div class="glass-panel about-card">
+            <p>
+              Hey, I'm <strong>Lukasz</strong> — I like technology &lt;3
+              on TikTok I'm <strong>@Lukasz.aep</strong>.
+            </p>
+            <p>
+              I run <strong>Gentoo Linux</strong> as my daily driver, I build most of my <strong>OS</strong> myself,
+              it's slow when compiling but that's okay.
+            </p>
+            <p>
+              This site itself is a project with AI, it's supposed to be in a <strong>"Frutiger Aero"</strong>
+              web look and the cozy <strong>"Wii Menu"</strong> vibe — glassy bubbles, glossy
+              buttons, rounded channels, and a big rotating globe for the interactive site enjoyers.
+            </p>
+          </div>
+          <div class="glass-panel stat-card">
+            <div class="stat"><span class="stat-num">100%</span><span class="stat-label">source-compiled</span></div>
+            <div class="stat"><span class="stat-num">∞</span><span class="stat-label">recompiles of my kernel</span></div>
+            <div class="stat"><span class="stat-num">@Lukasz.aep</span><span class="stat-label">on TikTok</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GENTOO KERNEL -->
+    <section id="kernel" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title">
+          <img src="assets/img/gentoo-glossy.webp" alt="" class="title-logo" width="500" height="600" loading="lazy" decoding="async">
+          My Gentoo Kernel
+        </h2>
+        <div class="card-grid">
+          <div class="glass-panel">
+            <h3>Built from source, on purpose WAW</h3>
+            <p>
+              No binary kernels here. I pull the sources straight from
+              <code>/usr/src/linux</code>, run <code>make menuconfig</code>, and hand-pick every
+              driver and subsystem my hardware actually needs — nothing more.
+            </p>
+            <ul class="feature-list">
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>Custom <code>.config</code> tuned specifically for my CPU and devices</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>Stripped of modules and drivers I'll never touch (firewire LOL &lt;3) </li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>Compiled with <code>-march=native -O2</code> in <code>make.conf</code></li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>OpenRC init for a lean, transparent boot</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>Rebuilt on every major kernel bump</li>
+            </ul>
+          </div>
+          <div class="glass-panel">
+            <h3>Why? uhhh</h3>
+            <p>
+              Faster boots, a smaller attack surface very opsec yes. Daily usage of the system helps me be better at linux in general,
+              while I can enjoy the smooth and snappy feel of it all.
+            </p>
+            <p>
+              Gentoo isn't the easy path, speaking from experience xD
+            </p>
+          </div>
+        </div>
+
+        <div class="setup-grid">
+          <div class="monitor">
+            <div class="monitor-screen">
+              <img src="assets/img/desktop-shot.webp" alt="My actual Gentoo desktop, KDE Plasma with fastfetch running" width="1280" height="720" loading="lazy" decoding="async">
+              <div class="screen-glare"></div>
+            </div>
+            <div class="monitor-led"></div>
+            <div class="monitor-stand"></div>
+            <div class="monitor-base"></div>
+          </div>
+
+          <div class="glass-panel terminal-card">
+            <div class="terminal-topbar">
+              <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+              <span class="terminal-title">biksy@localhost</span>
+            </div>
+            <pre class="terminal-body"><span class="t-prompt">biksy@localhost ~ $</span> fastfetch
+<span class="t-key">OS</span>       <span class="t-val">Gentoo Linux x86_64</span>
+<span class="t-key">Kernel</span>   <span class="t-val">Linux 6.18.37-gentoo-r1-gentoo-dist</span>
+<span class="t-key">WM</span>       <span class="t-val">KWin (Wayland)</span>
+<span class="t-key">CPU</span>      <span class="t-val">AMD Ryzen 7 9800X3D (16) @ 5.27GHz</span>
+<span class="t-key">GPU</span>      <span class="t-val">NVIDIA GeForce RTX 5070 [Discrete]</span>
+<span class="t-key">Packages</span> <span class="t-val">1114 (emerge), 8 (flatpak)</span>
+<span class="t-prompt">biksy@localhost ~ $</span> <span class="t-cursor">▌</span></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title"><span class="title-orb title-orb-purple"></span>Projects</h2>
+        <p class="section-sub">A few things I'm building</p>
+        <div class="project-grid">
+          <a class="glass-panel project-card" href="#vault">
+            <div class="project-icon">#AI</div>
+            <h3>obsidian + ai</h3>
+            <p>Obsidian vault, automated AI models and workflows.</p>
+            <div class="tags"><span>obsidian</span><span>claude</span></div>
+            <span class="project-goto" aria-hidden="true">open <svg class="li-arrow"><use href="#aero-arrow"/></svg></span>
+          </a>
+          <a class="glass-panel project-card" href="#setup">
+            <div class="project-icon">⚡</div>
+            <h3>home network</h3>
+            <p>Two boxes talking over NFS, a minecraft server that's actually live now (scroll down),
+              and a NAS + homemade router still on the list..</p>
+            <div class="tags"><span>nfs</span><span>openrc</span></div>
+            <span class="project-goto" aria-hidden="true">open <svg class="li-arrow"><use href="#aero-arrow"/></svg></span>
+          </a>
+          <a class="glass-panel project-card" href="/bonus">
+            <div class="project-icon">🌐</div>
+            <h3>this site</h3>
+            <p>This site and other business stuff lol. deploys itself when i hit save, real
+              functions behind it and everything.</p>
+            <div class="tags"><span>cloudflare</span><span>css</span></div>
+            <span class="project-goto" aria-hidden="true">open <svg class="li-arrow"><use href="#aero-arrow"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- OBSIDIAN + AI -->
+    <section id="vault" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title"><span class="title-orb title-orb-purple"></span>Obsidian + AI</h2>
+        <p class="section-sub">how i keep a second brain the ai can actually read</p>
+        <div class="card-grid">
+          <div class="glass-panel">
+            <h3>one vault, both machines</h3>
+            <p>
+              everything i figure out lives in an <strong>obsidian</strong> vault that syncthing
+              mirrors between the gentoo box and the server. the notes link to each other, so it's
+              a little graph of how my setup actually fits together — not a folder of dead txt files.
+            </p>
+          </div>
+          <div class="glass-panel">
+            <h3>the ai reads it too</h3>
+            <p>
+              same vault doubles as memory for my ai setup — it reads the notes on demand instead of
+              me re-explaining my machines every single time. cheaper on tokens, and it stops
+              forgetting stuff. every message i send gets quietly turned into a proper prompt first,
+              very lazy of me &lt;3
+            </p>
+            <div class="tags"><span>obsidian</span><span>syncthing</span><span>claude</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- THE SETUP — how the two boxes talk -->
+    <section id="setup" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title"><span class="title-orb"></span>The Setup</h2>
+        <p class="section-sub">how anything on this page actually reaches you</p>
+
+        <div class="glass-panel net-panel">
+          <div class="net-diagram">
+            <div class="net-node">
+              <span class="net-ico" aria-hidden="true">🖥️</span>
+              <strong>gentoo box</strong>
+              <span class="net-desc">9800X3D · RTX 5070<br>kde wayland · openrc</span>
+            </div>
+            <div class="net-link" aria-hidden="true"><span class="net-packet"></span><span class="net-label">nfs · syncthing</span></div>
+            <div class="net-node">
+              <span class="net-ico" aria-hidden="true">📦</span>
+              <strong>ubuntu box</strong>
+              <span class="net-desc">always on · runs the<br>mc server + pushers</span>
+            </div>
+            <div class="net-link" aria-hidden="true"><span class="net-packet"></span><span class="net-label">tunnel · cloudflare</span></div>
+            <div class="net-node">
+              <span class="net-ico" aria-hidden="true">🌐</span>
+              <strong>you</strong>
+              <span class="net-desc">reading this exact<br>page right now</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-grid setup-cards">
+          <div class="glass-panel">
+            <h3>two boxes, one room</h3>
+            <p>
+              the gentoo machine is the daily driver (ssh closed, nobody gets in lol) and the
+              ubuntu one just sits there being reliable. they share folders over <code>nfs</code>,
+              syncthing mirrors the important stuff both ways, and when the minecraft server
+              needs an op command i just fire <code>rcon.py</code> at it from this side of the room.
+            </p>
+          </div>
+          <div class="glass-panel">
+            <h3>the live widget, explained</h3>
+            <p>
+              a python script on the ubuntu box asks the jvm for its real heap numbers, strips
+              anything personal (no ips, ever), and pushes a tiny snapshot to a cloudflare
+              durable object. the page you're reading polls that copy — nothing on my lan is
+              reachable from the internet. very opsec yes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- MINECRAFT SERVER -->
+    <section id="server" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title"><span class="title-orb title-orb-green"></span>Minecraft Server</h2>
+        <p class="section-sub">forge 1.20.1 running off the ubuntu box. this is it, live</p>
+
+        <div class="glass-panel mc-panel">
+          <div class="mc-motd" aria-hidden="true">✦ LUKAS' FORGE SERVER ✦</div>
+          <div class="mc-head">
+            <span class="mc-orb" id="mcOrb" aria-hidden="true"></span>
+            <span class="mc-state" id="mcState" aria-live="polite">checking…</span>
+            <span class="mc-count" id="mcCount"></span>
+          </div>
+          <div class="mc-graph-wrap">
+            <div class="mc-graph-label"><span>ram</span><span id="mcRamNow">–</span></div>
+            <canvas id="mcGraph" height="120" role="img" aria-label="ram usage over the last while" aria-describedby="mcRamNow"></canvas>
+          </div>
+          <div class="mc-stats" id="mcStats">
+            <div class="mc-stat"><span class="mc-stat-label">tps</span><span class="mc-stat-val" id="mcTps">–</span></div>
+            <div class="mc-stat"><span class="mc-stat-label">tick</span><span class="mc-stat-val" id="mcMspt">–</span></div>
+            <div class="mc-stat"><span class="mc-stat-label">uptime</span><span class="mc-stat-val" id="mcUptime">–</span></div>
+          </div>
+          <div class="mc-players" id="mcPlayers"></div>
+        </div>
+
+        <div class="card-grid setup-cards">
+          <div class="glass-panel">
+            <h3>the tunnel saga xD</h3>
+            <p>
+              no port forwarding here — players come in through a playit.gg tunnel. the tunnel
+              tags every connection with a proxy header, and for a while that header was crashing
+              <em>every single login</em>. the fix: a tiny python proxy that strips the header
+              before forge ever sees it. side effect, the server now thinks everyone connects
+              from <code>127.0.0.1</code>, which is honestly very private of them.
+            </p>
+          </div>
+          <div class="glass-panel">
+            <h3>the mods</h3>
+            <p>create ecosystem plus a pile of performance mods so the tick times stay polite:</p>
+            <div class="tags mc-tags">
+              <span>create</span><span>create addition</span><span>new age</span><span>diesel generators</span>
+              <span>tom's storage</span><span>trade cycling</span><span>veinminer</span><span>towns &amp; towers</span><span>tectonic</span>
+              <span class="tag-perf">canary</span><span class="tag-perf">starlight</span><span class="tag-perf">modernfix</span>
+              <span class="tag-perf">ferritecore</span><span class="tag-perf">saturn</span><span class="tag-perf">clumps</span>
+              <span class="tag-perf">mobtimizations</span><span class="tag-perf">spark</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- NOW PLAYING — Frutiger Aero FM -->
+    <section id="playing" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title"><span class="title-orb title-orb-green"></span>Now Playing</h2>
+        <p class="section-sub">aero songs from tiktok, plus one station generated live in js</p>
+        <div class="player-wrap">
+          <div class="player-glow"></div>
+          <div class="radio">
+            <div class="radio-top">
+              <span class="radio-led" aria-hidden="true"></span>
+              <span class="radio-name">AERO FM</span>
+              <span class="radio-model">LKZ-2007</span>
+            </div>
+            <div class="radio-screen">
+              <div class="marquee" aria-hidden="true"><span class="marquee-track" id="trackName">AERO FM · press play · AERO FM · press play · </span></div>
+              <div class="eq-row">
+                <div class="eq-bars" id="eqBars">
+                  <span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              <div class="radio-meta"><span id="playTime">00:00</span><span id="stationName" aria-live="polite">NATURE FM 100.3</span></div>
+            </div>
+            <div class="radio-controls">
+              <button class="btn btn-blue btn-play" id="playBtn" aria-label="play" aria-pressed="false">▶</button>
+              <div class="stations" id="stations" role="group" aria-label="Radio stations">
+                <button class="station-pill active" data-station="0" aria-pressed="true">Nature FM</button>
+                <button class="station-pill" data-station="1" aria-pressed="false">Kolektor</button>
+                <button class="station-pill" data-station="2" aria-pressed="false">Wii Party</button>
+                <button class="station-pill" data-station="3" aria-pressed="false">Synth FM</button>
+              </div>
+              <label class="vol"><span>vol</span><input type="range" id="vol" min="0" max="100" value="70" aria-label="Radio volume"></label>
+            </div>
+          </div>
+          <div class="notes" aria-hidden="true"><span>♪</span><span>♫</span><span>♪</span><span>♫</span></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- THE RICE CORNER — dusk zone -->
+    <section id="rice" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title"><span class="title-orb title-orb-gold"></span>The Rice Corner</h2>
+        <p class="section-sub">it's late down here. this is where the desktop customization lives</p>
+        <div class="card-grid setup-cards">
+          <div class="glass-panel">
+            <h3>current rice</h3>
+            <ul class="rice-list">
+              <li>kde plasma on wayland, breeze mixed with the <strong>Sweet</strong> theme</li>
+              <li>colloid icons (purple, obviously) + bibata ice cursors</li>
+              <li>animated wallpapers — wallpaper engine's linux port, plus xwinwrap for the stubborn stuff</li>
+              <li>fastfetch tuned until the output looked right, then never touched again lol</li>
+            </ul>
+          </div>
+          <div class="glass-panel">
+            <h3>the desk</h3>
+            <p>
+              three 1080p monitors, the middle one runs 280hz and the other two just try
+              their best. most of the ricing energy goes into making all three feel like
+              one coherent setup instead of three random screens xD
+            </p>
+            <div class="tags rice-tags"><span>kde</span><span>wayland</span><span>sweet</span><span>280hz</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- TIKTOK -->
+    <section id="tiktok" class="channel">
+      <div class="channel-inner tiktok-inner">
+        <div class="glass-panel tiktok-card">
+          <div class="tiktok-orb" aria-hidden="true"></div>
+          <h2 class="section-title section-title-center">Find me on TikTok</h2>
+          <p class="tiktok-handle">@Lukasz.aep</p>
+          <p>Linux, Gentoo builds, kernel compiling, and whatever else ends up here it's all just slop anyways.</p>
+          <a href="https://www.tiktok.com/@Lukasz.aep" target="_blank" rel="noopener noreferrer" class="btn btn-pink btn-lg">
+            watch on tiktok
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Made with a lot of glossy CSS. <a class="footer-link" href="/bonus">bonus channel</a></p>
+    <p>© <span id="year"></span> Lukasz.aep</p>
+  </footer>
+
+  <script src="js/script.js" defer></script>
+  <script src="js/radio.js" defer></script>
+  <script src="js/mc-status.js" defer></script>
+</body>
+</html>

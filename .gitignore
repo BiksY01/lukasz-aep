@@ -1,0 +1,19 @@
+# secrets & machine-identifying data — never commit
+.wrangler/
+.dev.vars
+*.log
+.deploy.log
+node_modules/
+dist/
+# wrangler.toml holds your CF account/KV ids — keep it local, ship wrangler.toml.example instead
+wrangler.toml
+# infra / "how it's built" — kept local, not published
+functions/
+build.sh
+deploy.sh
+wrangler.toml.example
+_headers
+.deploy.lock
+.deploy.log
+GOAL.md
+.vscode/

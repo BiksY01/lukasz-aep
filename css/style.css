@@ -1,0 +1,1817 @@
+/* lukasz.aep — frutiger aero x wii menu
+   ------------------------------------------------
+   1  tokens & fonts        9  kernel
+   2  base                 10  projects
+   3  sky & globe          11  radio
+   4  nav                  12  tiktok
+   5  layout               13  bonus widgets
+   6  glass panels         14  footer & cursor
+   7  hero                 15  lite mode
+   8  about                16  phone sizes
+   ------------------------------------------------ */
+
+/* ---------- 1. tokens & fonts ---------- */
+@font-face{
+  font-family: "Fredoka";
+  src: url("../assets/fonts/fredoka.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Nunito";
+  src: url("../assets/fonts/nunito.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root{
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --aero-blue: #2ba8e0;
+  --aero-green: #6fd18c;
+  --aero-pink: #ff6fa5;
+  --aero-purple: #8b6df0;
+  --aero-purple-deep: #6a4fd6;
+  /* dusk gold — the one warm color, reserved for the rice corner down in
+     the dark end of the page, like a lamp on at night */
+  --aero-gold: #f2a950;
+  --aero-gold-deep: #c97f2e;
+  --text-dark: #1c3d4a;
+  --text-mid: #3c6472;
+  --shadow-soft: 0 10px 30px rgba(30, 90, 110, 0.18);
+  --font-display: "Fredoka", "Trebuchet MS", sans-serif;
+  --font-body: "Nunito", "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", monospace;
+  --panel-edge: rgba(255,255,255,0.9);
+}
+
+/* ---------- 2. base ---------- */
+*{ box-sizing: border-box; }
+.visually-hidden-defs{ position: absolute; }
+
+/* base font scales up on bigger screens (the whole UI is rem-based, so
+   this upscales text + spacing together) while staying compact on phones.
+   the clamp is in rem, not px, so someone who bumps their browser/OS default
+   text size still gets it — a px root would silently ignore that setting */
+html{ scroll-behavior: smooth; font-size: clamp(1rem, 0.9375rem + 0.28vw, 1.25rem); scrollbar-color: var(--aero-purple) rgba(255,255,255,0.35); }
+
+/* the sky runs warm lavender up top into cold deep blue — scrolling down
+   literally cools the page off. past the radio it keeps going: the blue
+   deepens into proper dusk, so the bottom of the page reads like the same
+   day, just later. the rice corner lives down there with the gold. */
+body{
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--text-dark);
+  background: linear-gradient(180deg,
+    #dcd6fa 0%, #aab8f5 14%, #8bc7ee 34%,
+    #6cb2d6 52%, #4d90ba 68%, #38709c 80%,
+    #2d5f8b 88%, #22456e 95%, #182f4f 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+::selection{ background: rgba(139,109,240,0.35); }
+
+::-webkit-scrollbar{ width: 12px; }
+::-webkit-scrollbar-track{ background: rgba(255,255,255,0.35); }
+::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, #8bc7ee, #8b6df0);
+  border-radius: 999px;
+  border: 3px solid rgba(230,238,255,0.85);
+}
+
+a:focus-visible, button:focus-visible, .tab:focus-visible, input:focus-visible{
+  outline: 3px solid var(--aero-purple);
+  outline-offset: 3px;
+}
+
+/* keyboard users get a glossy pill straight to the content */
+.skip-link{
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 40;
+  transform: translateY(-260%);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--aero-purple-deep);
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.7));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.9);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.skip-link:focus-visible{ transform: none; }
+
+/* ---------- 3. sky & globe ---------- */
+/* the globe is two nested elements so both animations run on the
+   compositor: the wrapper turns with scroll (where the browser
+   supports scroll timelines) and the inner one never stops
+   spinning slowly. no js touches it, so phones stay smooth. */
+.globe-wrap{
+  position: fixed;
+  top: 50%;
+  right: -100px;
+  width: 940px;
+  height: 940px;
+  translate: 0 -50%;
+  z-index: 0;
+  pointer-events: none;
+}
+@supports (animation-timeline: scroll()){
+  .globe-wrap{
+    animation: globe-scroll linear both;
+    animation-timeline: scroll(root);
+  }
+  /* the hero card drifts up and fades as you scroll past it.
+     `translate`, not `transform`, so it never fights the tilt. */
+  body:not(.lite) .hero-content{
+    animation:
+      panel-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards,
+      hero-drift linear both;
+    animation-timeline: auto, scroll(root);
+    animation-range: normal, 0vh 90vh;
+  }
+  /* depth: the monitor (near) sinks while the glow (far) climbs, at
+     different speeds — three layers moving apart is what sells the 3d.
+     both ride `translate` on the compositor, zero layout work. */
+  body:not(.lite) .hero-monitor{
+    animation:
+      monitor-float 6s ease-in-out infinite,
+      monitor-para linear both;
+    animation-timeline: auto, scroll(root);
+    animation-range: normal, 0vh 120vh;
+  }
+  body:not(.lite) .globe-glow{
+    animation: glow-para linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0vh 200vh;
+  }
+}
+@keyframes monitor-para{
+  to{ translate: 0 90px; }
+}
+@keyframes glow-para{
+  to{ translate: 0 calc(-50% - 110px); }
+}
+@keyframes globe-scroll{
+  to{ transform: rotate(160deg); }
+}
+@keyframes hero-drift{
+  to{ translate: 0 -46px; opacity: 0.25; }
+}
+/* safari + most non-chromium have no scroll-driven animations, so the globe
+   above never reacts to scrolling there. script.js detects that, adds this
+   class, and feeds rotation in through --globe-rotate instead. the compositor
+   path stays untouched for browsers that support it. --para is the same
+   scroll progress (0..1) reused for the depth layers. */
+.globe-js .globe-wrap{ transform: rotate(var(--globe-rotate, 0deg)); }
+.globe-js:not(.lite) .hero-content{ translate: 0 var(--hero-shift, 0px); }
+.globe-js:not(.lite) .hero-monitor{ translate: 0 calc(var(--para, 0) * 90px); }
+.globe-js:not(.lite) .globe-glow{ translate: 0 calc(-50% - var(--para, 0) * 110px); }
+.globe-bg{
+  width: 100%;
+  height: 100%;
+  background: url('../assets/img/globe-glass.webp') center / contain no-repeat;
+  animation: globe-spin 80s linear infinite;
+  filter: drop-shadow(0 0 80px rgba(139, 109, 240, 0.45)) saturate(1.08);
+}
+@keyframes globe-spin{
+  to{ transform: rotate(360deg); }
+}
+.globe-glow{
+  position: fixed;
+  top: 50%;
+  right: -200px;
+  width: 1020px;
+  height: 1020px;
+  translate: 0 -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.5), rgba(155,125,255,0.12) 55%, transparent 72%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* soft sunlight blob drifting across the sky */
+body::after{
+  content: "";
+  position: fixed;
+  top: -22%; left: -12%;
+  width: 66vw; height: 66vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.55), transparent 65%);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  animation: light-drift 26s ease-in-out infinite alternate;
+}
+@keyframes light-drift{
+  to{ transform: translate3d(48vw, 20vh, 0) scale(1.18); }
+}
+
+.bubbles{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bubbles span{
+  position: absolute;
+  bottom: -120px;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.1) 60%, transparent 70%);
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.6);
+  animation: rise linear infinite;
+}
+.bubbles span:nth-child(1){ left: 5%;  width: 22px; height: 22px; animation-duration: 14s; }
+.bubbles span:nth-child(2){ left: 15%; width: 12px; height: 12px; animation-duration: 10s; animation-delay: 2s; }
+.bubbles span:nth-child(3){ left: 28%; width: 30px; height: 30px; animation-duration: 18s; animation-delay: 1s; }
+.bubbles span:nth-child(4){ left: 42%; width: 16px; height: 16px; animation-duration: 12s; animation-delay: 4s; }
+.bubbles span:nth-child(5){ left: 58%; width: 24px; height: 24px; animation-duration: 16s; animation-delay: 3s; }
+.bubbles span:nth-child(6){ left: 68%; width: 14px; height: 14px; animation-duration: 11s; animation-delay: 5s; }
+.bubbles span:nth-child(7){ left: 78%; width: 20px; height: 20px; animation-duration: 15s; animation-delay: 2.5s; }
+.bubbles span:nth-child(8){ left: 85%; width: 10px; height: 10px; animation-duration: 9s;  animation-delay: 6s; }
+.bubbles span:nth-child(9){ left: 92%; width: 26px; height: 26px; animation-duration: 17s; animation-delay: 1.5s; }
+.bubbles span:nth-child(10){ left: 35%; width: 18px; height: 18px; animation-duration: 13s; animation-delay: 7s; }
+@keyframes rise{
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 0.9; }
+  100% { transform: translateY(-115vh) translateX(20px); opacity: 0; }
+}
+
+.hearts{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.heart{
+  position: absolute;
+  bottom: -60px;
+  filter: drop-shadow(0 4px 8px rgba(223,61,120,0.25));
+  animation: heart-rise linear infinite;
+}
+.heart:nth-child(1){ left: 10%; width: 22px; height: 22px; animation-duration: 15s; animation-delay: 1s; }
+.heart:nth-child(2){ left: 48%; width: 16px; height: 16px; animation-duration: 12s; animation-delay: 5s; }
+.heart:nth-child(3){ left: 72%; width: 26px; height: 26px; animation-duration: 18s; animation-delay: 2.5s; }
+.heart:nth-child(4){ left: 25%; width: 14px; height: 14px; animation-duration: 10s; animation-delay: 8s; }
+.heart:nth-child(5){ left: 90%; width: 20px; height: 20px; animation-duration: 16s; animation-delay: 4s; }
+.heart:nth-child(6){ left: 60%; width: 15px; height: 15px; animation-duration: 13s; animation-delay: 9.5s; }
+@keyframes heart-rise{
+  0%   { transform: translateY(0) translateX(0) rotate(-8deg); opacity: 0; }
+  10%  { opacity: 0.85; }
+  50%  { transform: translateY(-58vh) translateX(-18px) rotate(8deg); }
+  100% { transform: translateY(-115vh) translateX(14px) rotate(-6deg); opacity: 0; }
+}
+
+/* ---------- 4. nav ---------- */
+.wiibar{
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 12px 16px;
+}
+.wiibar-inner{
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.55));
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 7px 9px 7px 20px;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.9);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+}
+.brand{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--text-dark);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.brand-dot{ color: inherit; }
+.brand-orb{
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--aero-blue) 60%, #1c7fb0 100%);
+  box-shadow: 0 0 10px rgba(43,168,224,0.6);
+  flex-shrink: 0;
+}
+.brand-orb, .title-orb{ animation: orb-pulse 3.2s ease-in-out infinite; }
+@keyframes orb-pulse{
+  0%, 100% { box-shadow: 0 0 8px rgba(43,168,224,0.55); transform: scale(1); }
+  50% { box-shadow: 0 0 16px rgba(43,168,224,0.95); transform: scale(1.08); }
+}
+.tabs{
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 0;
+}
+.tab{
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  text-decoration: none;
+  color: var(--text-mid);
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid transparent;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+  white-space: nowrap;
+  animation: tab-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+/* tabs slide in one after another on load, wii style */
+.tab:nth-child(1){ animation-delay: 0.05s; }
+.tab:nth-child(2){ animation-delay: 0.1s; }
+.tab:nth-child(3){ animation-delay: 0.15s; }
+.tab:nth-child(4){ animation-delay: 0.2s; }
+.tab:nth-child(5){ animation-delay: 0.25s; }
+.tab:nth-child(6){ animation-delay: 0.3s; }
+.tab:nth-child(7){ animation-delay: 0.35s; }
+.tab:nth-child(8){ animation-delay: 0.4s; }
+.tab:nth-child(9){ animation-delay: 0.45s; }
+.tab:nth-child(10){ animation-delay: 0.5s; }
+@keyframes tab-in{
+  from{ opacity: 0; transform: translateY(-10px); }
+}
+.tab:hover{
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 6px 16px rgba(43,168,224,0.25);
+}
+.tab:active{ transform: translateY(0) scale(0.96); }
+.tab.active{
+  color: #fff;
+  background: linear-gradient(135deg, #5cc2f0, var(--aero-purple));
+  box-shadow: 0 6px 16px rgba(139,109,240,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+.tab-extras{
+  background: linear-gradient(135deg, #ffd3e8, #d9c9ff);
+  color: #6a4fd6;
+  font-weight: 600;
+}
+/* sliding "channel select" pill — js moves it to the active tab so the
+   highlight glides between channels instead of snapping. wii menu energy */
+.tab-glider{
+  position: absolute;
+  top: 0; left: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #5cc2f0, var(--aero-purple));
+  box-shadow: 0 6px 16px rgba(139,109,240,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
+  z-index: -1;
+  opacity: 0;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), width 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+}
+.tab-glider.ready{ opacity: 1; }
+.lite .tab-glider{ transition: none; }
+
+/* ---------- 5. layout ---------- */
+main{ position: relative; z-index: 1; }
+.channel{
+  display: flex;
+  align-items: center;
+  padding: 46px 20px;
+  scroll-margin-top: 84px;
+}
+.channel-inner{
+  max-width: 1040px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* wavy divider between channels */
+.channel + .channel{ position: relative; }
+.channel + .channel::before{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 22px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 22' preserveAspectRatio='none'%3E%3Cpath d='M0,14 Q25,2 50,14 T100,14 T150,14 T200,14 V22 H0 Z' fill='rgba(255,255,255,0.55)'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 200px 22px;
+  z-index: 2;
+  animation: wave-drift 16s linear infinite;
+}
+@keyframes wave-drift{
+  from{ background-position-x: 0px; }
+  to{ background-position-x: 200px; }
+}
+
+/* don't render channels that are off screen */
+#kernel, #projects, #vault, #setup, #server, #playing, #rice, #tiktok{ content-visibility: auto; }
+#vault{ contain-intrinsic-size: auto 640px; }
+#rice{ contain-intrinsic-size: auto 620px; }
+#kernel{ contain-intrinsic-size: auto 1250px; }
+#projects{ contain-intrinsic-size: auto 700px; }
+#setup{ contain-intrinsic-size: auto 950px; }
+#server{ contain-intrinsic-size: auto 1100px; }
+#playing{ contain-intrinsic-size: auto 860px; }
+#tiktok{ contain-intrinsic-size: auto 540px; }
+
+/* ---------- 6. glass panels ---------- */
+.glass-panel{
+  --mx: 50%;
+  --my: 15%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.35));
+  border: 1px solid var(--glass-border);
+  border-radius: 26px;
+  padding: 26px 30px;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 0 0 1px var(--panel-edge);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  transform: perspective(900px) rotateX(0deg) rotateY(0deg);
+}
+.glass-panel::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,0.35), rgba(255,255,255,0.08) 40%, transparent 65%);
+  pointer-events: none;
+}
+
+/* scroll reveal. js adds the class, so without js everything just
+   shows. `translate` is its own property here so it never fights
+   the tilt effect writing `transform` inline. */
+.reveal{
+  opacity: 0;
+  translate: 0 26px;
+  transition: opacity 0.7s ease, translate 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.in{
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* ---------- 7. hero ---------- */
+/* svh (small viewport) not vh, so the hero always fits above a mobile
+   browser's address bar instead of getting clipped when the bar is shown */
+.hero{ justify-content: center; text-align: center; min-height: 82vh; min-height: 82svh; position: relative; }
+.hero-monitor{
+  position: absolute;
+  left: clamp(-20px, 2vw, 40px);
+  top: clamp(10px, 8vh, 90px);
+  width: clamp(120px, 15vw, 220px);
+  height: auto;
+  z-index: 1;
+  filter: drop-shadow(0 18px 26px rgba(20,40,80,0.35));
+  animation: monitor-float 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes monitor-float{
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-14px) rotate(1deg); }
+}
+.hero-content{
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 44px 36px;
+  animation: panel-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.wii-remote-glow{
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(255,255,255,0.9), transparent 70%);
+  z-index: 0;
+}
+.chrome-text{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 7vw, 4.1rem);
+  margin: 0;
+  letter-spacing: 1px;
+  background: linear-gradient(115deg, #ffffff 0%, #cfd6ff 18%, #8b6df0 38%, #2ba8e0 54%, #9be1ff 68%, #ffffff 84%, #cfd6ff 100%);
+  background-size: 230% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.4);
+  filter: drop-shadow(0 6px 12px rgba(43,168,224,0.35));
+  animation: chrome-flow 9s ease-in-out infinite, pop-in 0.9s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.chrome-text .dim{ opacity: 1; }
+@keyframes chrome-flow{
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.subtitle{
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text-mid);
+  margin-top: 6px;
+}
+.cta-row{
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+.scroll-hint{
+  margin-top: 30px;
+  font-size: 0.82rem;
+  color: var(--text-mid);
+  opacity: 0.8;
+  animation: bob 2.4s ease-in-out infinite, fade-in 0.8s 0.85s ease backwards;
+}
+@keyframes bob{
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* staggered entrance. backwards-fill only, so the tilt effect can
+   write inline transforms once the intro is over */
+.hero .subtitle{ animation: rise-in 0.7s 0.3s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.hero .cta-row{ animation: rise-in 0.7s 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+@keyframes panel-in{ from{ opacity: 0; transform: translateY(26px) scale(0.97); } }
+@keyframes rise-in{ from{ opacity: 0; transform: translateY(22px); } }
+@keyframes pop-in{ from{ opacity: 0; transform: scale(0.86) translateY(16px); } }
+@keyframes fade-in{ from{ opacity: 0; } }
+
+/* glossy wii buttons */
+.btn{
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: #fff;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.6);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  cursor: pointer;
+}
+.btn::after{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0));
+  border-radius: 999px 999px 50% 50% / 999px 999px 100% 100%;
+  pointer-events: none;
+}
+.btn::before{
+  content: "";
+  position: absolute;
+  top: -20%; bottom: -20%;
+  left: 0;
+  width: 34%;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,0.8), transparent);
+  transform: translateX(-140%) skewX(-18deg);
+  pointer-events: none;
+  transition: transform 0.55s ease;
+}
+.btn:hover::before{ transform: translateX(340%) skewX(-18deg); }
+.btn:hover{ transform: translateY(-3px) scale(1.04); }
+/* wii buttons click down when you press them */
+.btn:active{ transform: translateY(-1px) scale(0.97); transition-duration: 0.08s; }
+/* gradients lean on their existing deep partners so the white labels
+   actually pass contrast — same palette, just less washed at the top */
+.btn-blue{ background: linear-gradient(135deg, #2f9fd8, var(--aero-purple-deep)); }
+.btn-pink{ background: linear-gradient(135deg, #f0619b, #df3d78); }
+.btn-green{ background: linear-gradient(135deg, #4db77a, #23814a); }
+.btn-lg{ padding: 14px 30px; font-size: 1rem; }
+
+/* section titles */
+.section-title{
+  font-family: var(--font-display);
+  text-wrap: balance;
+  font-size: clamp(1.45rem, 3.5vw, 2rem);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.section-sub{ color: var(--text-mid); margin-top: 0; margin-bottom: 24px; }
+/* --text-mid was tuned against the light top of the sky — down in the dusk
+   half it drowns, so the subs switch to a pale ink there */
+#server .section-sub, #playing .section-sub, #rice .section-sub{ color: #e6f1fa; text-shadow: 0 1px 3px rgba(10,30,50,0.35); }
+.section-title-center{ justify-content: center; }
+.title-orb{
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--aero-blue) 65%, #1c7fb0 100%);
+  box-shadow: 0 0 10px rgba(43,168,224,0.6);
+  flex-shrink: 0;
+  position: relative;
+}
+/* one-shot ring flare when a section title scrolls into view — piggybacks on
+   the .reveal/.in classes the scroll-reveal js already toggles, zero new js */
+.title-orb::after{
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(43,168,224,0.6);
+  opacity: 0;
+  transform: scale(0.6);
+}
+.section-title.in .title-orb::after{
+  animation: orb-flare 0.7s 0.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes orb-flare{
+  0%{ opacity: 0.9; transform: scale(0.6); }
+  100%{ opacity: 0; transform: scale(2.4); }
+}
+.title-orb-green{ background: radial-gradient(circle at 30% 30%, #fff, var(--aero-green) 65%, #2e9c56 100%); }
+.title-orb-purple{ background: radial-gradient(circle at 30% 30%, #fff, var(--aero-purple) 65%, #6a4fd6 100%); }
+.title-logo{
+  width: 32px; height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 3px 6px rgba(60,30,120,0.25));
+  border-radius: 8px;
+}
+
+/* ---------- 8. about ---------- */
+#about{
+  position: relative;
+  background-image:
+    linear-gradient(180deg, rgba(214,217,251,0.82), rgba(139,199,238,0.75) 60%, rgba(120,180,215,0.82)),
+    url('../assets/img/about-vista.webp');
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+}
+.card-grid{
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+.about-card p{ line-height: 1.7; }
+.stat-card{ display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+.stat{ text-align: center; }
+.stat-num{
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--aero-purple-deep);
+  font-weight: 600;
+}
+.stat-label{ font-size: 0.82rem; color: var(--text-mid); }
+
+code{
+  background: rgba(139,109,240,0.14);
+  color: var(--aero-purple-deep);
+  padding: 2px 7px;
+  border-radius: 8px;
+  font-size: 0.88em;
+}
+
+/* ---------- 9. kernel ---------- */
+.feature-list{ line-height: 1.85; padding-left: 0; list-style: none; }
+.feature-list li{ display: flex; align-items: center; gap: 10px; }
+.li-arrow{ width: 22px; height: 14px; flex-shrink: 0; }
+
+.setup-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: center;
+  margin-top: 28px;
+}
+.monitor{
+  position: relative;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 14px 14px 0;
+  background: linear-gradient(160deg, rgba(255,255,255,0.9), rgba(180,220,255,0.55));
+  border: 1px solid var(--glass-border);
+  border-radius: 22px;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.monitor-screen{
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 5px solid #0c2733;
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.7);
+  background: #000;
+}
+.monitor-screen img{
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 8s ease;
+}
+.monitor:hover .monitor-screen img{ transform: scale(1.06); }
+.screen-glare{
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 25%, transparent 45%);
+  pointer-events: none;
+}
+.monitor-led{
+  width: 8px; height: 8px;
+  margin: 9px auto 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #baffc9, var(--aero-green));
+  box-shadow: 0 0 8px rgba(111,209,140,0.9);
+}
+.monitor-stand{
+  width: 64px; height: 36px;
+  margin: 0 auto;
+  background: linear-gradient(160deg, rgba(255,255,255,0.9), rgba(180,220,255,0.5));
+  clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+}
+.monitor-base{
+  width: 170px; height: 15px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, rgba(255,255,255,0.95), rgba(180,220,255,0.6));
+  box-shadow: var(--shadow-soft);
+}
+
+.terminal-card{ font-family: var(--font-mono); }
+.terminal-topbar{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -8px -12px 12px;
+  padding: 9px 14px;
+  background: rgba(20, 30, 45, 0.9);
+  border-radius: 14px 14px 0 0;
+}
+.dot{ width: 11px; height: 11px; border-radius: 50%; }
+.dot-red{ background: #ff5f57; }
+.dot-yellow{ background: #febc2e; }
+.dot-green{ background: #28c840; }
+.terminal-title{
+  margin-left: 8px;
+  color: #cfe8ff;
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+.terminal-body{
+  margin: -12px -12px -8px;
+  padding: 16px 18px 20px;
+  background: rgba(12, 20, 32, 0.95);
+  border-radius: 0 0 20px 20px;
+  color: #d6f3e3;
+  font-size: 0.8rem;
+  line-height: 1.85;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.t-prompt{ color: var(--aero-green); }
+.t-key{ color: #7fd1ff; display: inline-block; min-width: 74px; }
+.t-val{ color: #f1f6ff; }
+.t-cursor{ animation: blink 1s step-end infinite; color: var(--aero-green); }
+@keyframes blink{ 50%{ opacity: 0; } }
+
+/* ---------- 10. projects ---------- */
+.project-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.project-card{
+  text-decoration: none;
+  color: var(--text-dark);
+}
+.project-card:hover{
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 34px rgba(43,168,224,0.28);
+}
+.project-icon{ font-size: 1.7rem; margin-bottom: 8px; }
+.tags{ display: flex; gap: 8px; margin-top: 12px; }
+.tags span{
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(43,168,224,0.14);
+  color: var(--aero-blue);
+  font-weight: 700;
+}
+/* glossy "open" strip that slides up from a project card's bottom edge on
+   hover. touch devices never hover, the card is still a full tap target */
+.project-card{ padding-bottom: 54px; }
+.project-goto{
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--aero-purple-deep);
+  background: linear-gradient(0deg, rgba(255,255,255,0.85), rgba(255,255,255,0));
+  translate: 0 100%;
+  opacity: 0;
+  transition: translate 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+.project-goto .li-arrow{ width: 16px; height: 10px; transition: translate 0.28s ease; }
+.project-card:hover .project-goto{ translate: 0 0; opacity: 1; }
+.project-card:hover .project-goto .li-arrow{ translate: 4px 0; }
+/* dusk sections get their own edge light on the glass — the rice corner's
+   lamp bleeds into the panel border itself */
+#rice .glass-panel{ --panel-edge: rgba(242,169,80,0.35); }
+
+/* ---------- 11. radio ---------- */
+.player-wrap{
+  position: relative;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 10px 0 20px;
+}
+.player-glow{
+  position: absolute;
+  inset: -6% 2%;
+  background: radial-gradient(ellipse at center, rgba(139,109,240,0.3), rgba(43,168,224,0.12) 55%, transparent 75%);
+  filter: blur(10px);
+  z-index: 0;
+  animation: pulse-glow 3.2s ease-in-out infinite;
+}
+@keyframes pulse-glow{
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+/* the device is built out of css so it can't ever misalign */
+.radio{
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(165deg, rgba(255,255,255,0.92), rgba(200,228,252,0.75) 55%, rgba(255,255,255,0.85));
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 18px 20px 20px;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -8px 18px rgba(120,170,220,0.25);
+}
+.radio-top{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px 10px;
+  font-family: var(--font-display);
+}
+.radio-led{
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #9db4c4;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.player-wrap.playing .radio-led{
+  background: radial-gradient(circle, #baffc9, var(--aero-green));
+  box-shadow: 0 0 8px rgba(111,209,140,0.95);
+}
+.radio-name{
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+}
+.radio-model{
+  margin-left: auto;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  color: var(--text-mid);
+  opacity: 0.7;
+}
+.radio-screen{
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #123049 0%, #0a1c2e 100%);
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 14px;
+  box-shadow: inset 0 4px 14px rgba(0,0,0,0.55), inset 0 -2px 8px rgba(43,168,224,0.25);
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* fixed top gloss + a slow light sweep across the lcd */
+.radio-screen::after{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 42%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0));
+  pointer-events: none;
+}
+.radio-screen::before{
+  content: "";
+  position: absolute;
+  top: -30%; bottom: -30%;
+  left: 0;
+  width: 26%;
+  background: linear-gradient(105deg, transparent, rgba(158,220,255,0.16), transparent);
+  transform: translateX(-160%) skewX(-15deg);
+  animation: lcd-sweep 7s ease-in-out 2s infinite;
+  pointer-events: none;
+}
+@keyframes lcd-sweep{
+  0%{ transform: translateX(-160%) skewX(-15deg); }
+  45%, 100%{ transform: translateX(540%) skewX(-15deg); }
+}
+.marquee{
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* hover the lcd to freeze the ticker and actually read it */
+.marquee:hover .marquee-track{ animation-play-state: paused; }
+.marquee-track{
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #9fdcff;
+  text-shadow: 0 0 8px rgba(80,190,255,0.5);
+  animation: marquee-scroll 12s linear infinite;
+}
+@keyframes marquee-scroll{
+  0%{ transform: translateX(0); }
+  100%{ transform: translateX(-50%); }
+}
+.eq-row{
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 46px;
+}
+.eq-bars{
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 100%;
+}
+.eq-bars span{
+  display: block;
+  width: 9px;
+  height: 100%;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #8fe7ff, #2ba8e0);
+  box-shadow: 0 0 6px rgba(80,190,255,0.35);
+  transform-origin: bottom;
+  transform: scaleY(0.35);
+  animation: eq-idle 1.1s ease-in-out infinite;
+}
+.eq-bars span:nth-child(1){ animation-delay: 0s; }
+.eq-bars span:nth-child(2){ animation-delay: 0.15s; }
+.eq-bars span:nth-child(3){ animation-delay: 0.3s; }
+.eq-bars span:nth-child(4){ animation-delay: 0.45s; }
+.eq-bars span:nth-child(5){ animation-delay: 0.1s; }
+.eq-bars span:nth-child(6){ animation-delay: 0.35s; }
+.eq-bars span:nth-child(7){ animation-delay: 0.2s; }
+.eq-bars span:nth-child(8){ animation-delay: 0.5s; }
+@keyframes eq-idle{
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(0.6); }
+}
+/* while playing, js drives the bars off the real signal */
+.eq-bars.live span{ animation: none; }
+.radio-meta{
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #7fc5ec;
+}
+.radio-meta span{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.radio-controls{
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.btn-play{
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+.stations{
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.station-pill{
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.55);
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+}
+.station-pill:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 6px 14px rgba(43,168,224,0.25);
+}
+.station-pill:active{ transform: translateY(0) scale(0.95); transition-duration: 0.08s; }
+.station-pill.active{
+  color: #fff;
+  background: linear-gradient(135deg, #6fd18c, #2ba8e0);
+  box-shadow: 0 6px 16px rgba(111,209,140,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+.vol{
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+.vol input{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 150px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8bc7ee, #8b6df0);
+  outline: none;
+  cursor: pointer;
+}
+.vol input::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  width: 19px; height: 19px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #cfe6ff 70%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 2px 6px rgba(30,90,110,0.35);
+}
+.vol input::-moz-range-thumb{
+  width: 19px; height: 19px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #cfe6ff 70%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 2px 6px rgba(30,90,110,0.35);
+}
+
+/* notes float up only while something is playing */
+.notes{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.notes span{
+  position: absolute;
+  bottom: 10%;
+  font-size: 1.3rem;
+  opacity: 0;
+  animation: note-rise 4.5s ease-in infinite;
+  animation-play-state: paused;
+}
+.player-wrap.playing .notes span{ animation-play-state: running; }
+.notes span:nth-child(1){ left: 6%;  animation-delay: 0s;    color: var(--aero-pink); }
+.notes span:nth-child(2){ left: 90%; animation-delay: 1.2s;  color: var(--aero-blue); }
+.notes span:nth-child(3){ left: 16%; animation-delay: 2.4s;  color: var(--aero-purple); }
+.notes span:nth-child(4){ left: 80%; animation-delay: 3.4s;  color: var(--aero-green); }
+@keyframes note-rise{
+  0%{ transform: translateY(0) rotate(0deg); opacity: 0; }
+  15%{ opacity: 1; }
+  100%{ transform: translateY(-200px) rotate(20deg); opacity: 0; }
+}
+
+/* ---------- 12. tiktok ---------- */
+.tiktok-inner{ display: flex; justify-content: center; }
+.tiktok-card{ max-width: 520px; text-align: center; }
+.tiktok-orb{
+  width: 42px; height: 42px;
+  margin: 0 auto 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--aero-pink) 65%, #df3d78 100%);
+  box-shadow: 0 0 14px rgba(255,111,165,0.55);
+}
+.tiktok-handle{
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--aero-pink);
+  font-weight: 600;
+}
+
+/* ---------- 13. bonus widgets ---------- */
+.widget-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+.widget h3{
+  margin-top: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.widget-wide{ margin-top: 18px; }
+.widget-center{ text-align: center; }
+.widget .btn{ border: 0; cursor: pointer; }
+.clock-time{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--aero-purple-deep);
+  text-align: center;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.6);
+}
+.clock-date{
+  text-align: center;
+  color: var(--text-mid);
+  font-family: var(--font-display);
+  margin-top: 2px;
+}
+/* uptime counter gets the green — the clock already owns purple */
+.uptime-num{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--aero-green);
+  text-align: center;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.6);
+}
+.weather-orb{
+  width: 44px; height: 44px;
+  margin: 4px auto 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #8bc7ee 60%, #2ba8e0 100%);
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.7), 0 4px 12px rgba(43,168,224,0.35);
+}
+.weather-line{
+  text-align: center;
+  color: var(--text-mid);
+  font-family: var(--font-display);
+  margin: 4px 0;
+}
+
+/* find me: discord + tiktok */
+.findme{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  padding-top: 6px;
+}
+
+/* live server status card, fed by /api/stats */
+.status-line{
+  text-align: center;
+  font-family: var(--font-display);
+  color: var(--text-mid);
+  margin: 6px 0 10px;
+}
+.status-dot{
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #9db4c4;
+  margin-right: 8px;
+}
+.status-dot.up{
+  background: radial-gradient(circle, #baffc9, var(--aero-green));
+  box-shadow: 0 0 8px rgba(111,209,140,0.9);
+  animation: orb-pulse 3s ease-in-out infinite;
+}
+.status-dot.down{ background: #e07b7b; }
+
+/* the shrine: pics i hoard */
+.shrine-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.shrine-grid a{
+  display: block;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 6px 16px rgba(30,90,110,0.18);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.shrine-grid img{
+  display: block;
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+.shrine-grid a:hover{
+  transform: scale(1.05) rotate(-1deg);
+  box-shadow: 0 12px 26px rgba(43,168,224,0.35);
+}
+
+.pop-field{
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(139,199,238,0.3), rgba(214,243,227,0.55));
+  border: 1px solid var(--glass-border);
+  touch-action: manipulation;
+}
+.pop-bubble{
+  position: absolute;
+  bottom: -80px;
+  background: none;
+  border: 0;
+  padding: 0;
+  will-change: transform;
+}
+.pop-bubble .skin{
+  display: block;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(180,225,255,0.35) 60%, rgba(255,255,255,0.15));
+  border: 1px solid rgba(255,255,255,0.85);
+  box-shadow: inset 0 0 12px rgba(255,255,255,0.7), 0 4px 10px rgba(43,168,224,0.25);
+}
+.pop-bubble .skin.pop{ animation: bubble-pop 0.18s ease-out forwards; }
+@keyframes bubble-pop{
+  to{ transform: scale(1.7); opacity: 0; }
+}
+.pop-hud{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  color: var(--text-mid);
+  margin-top: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pop-hud .btn{ padding: 9px 20px; }
+
+/* bubble-pop leaderboard */
+.lb{ margin-top: 18px; }
+.lb-head{ display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.lb-head h4{ margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+.lb-note{ font-size: 0.76rem; color: var(--text-mid); }
+.lb-list{
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  counter-reset: rank;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lb-list li{
+  counter-increment: rank;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.42);
+  border: 1px solid var(--glass-border);
+  font-family: var(--font-display);
+}
+.lb-list li::before{
+  content: counter(rank);
+  flex-shrink: 0;
+  width: 22px;
+  font-weight: 700;
+  color: var(--aero-purple-deep);
+  text-align: center;
+}
+/* the top three get a warmer medal tint */
+.lb-list li:nth-child(1)::before{ color: #d9a400; }
+.lb-list li:nth-child(2)::before{ color: #8aa0ad; }
+.lb-list li:nth-child(3)::before{ color: #c07a3e; }
+.lb-name{ flex: 1; color: var(--text-dark); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-score{ font-weight: 700; color: var(--aero-blue); }
+.lb-empty{ justify-content: center; color: var(--text-mid); }
+.lb-form{ display: flex; gap: 10px; flex-wrap: wrap; }
+.lb-input{
+  flex: 1;
+  min-width: 140px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 11px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.6);
+  color: var(--text-dark);
+}
+.lb-input:focus-visible{ outline: 3px solid var(--aero-purple); outline-offset: 2px; }
+.lb-form .btn{ flex-shrink: 0; }
+
+.quote-box{
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text-dark);
+  transition: opacity 0.25s ease;
+}
+
+/* ---------- 14. footer & cursor ---------- */
+/* the footer sits on the coldest part of the sky, so it goes light */
+.footer{
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 24px 20px max(40px, calc(env(safe-area-inset-bottom) + 24px));
+  color: rgba(224, 238, 250, 0.88);
+  font-size: 0.82rem;
+}
+.footer-link{
+  color: #cfe4ff;
+  font-weight: 700;
+  text-decoration: none;
+}
+.footer-link:hover{ text-decoration: underline; }
+
+@media (hover: hover) and (pointer: fine){
+  body{ cursor: none; }
+  a, button, .tab, .btn, .project-card{ cursor: none; }
+}
+.wii-cursor{
+  position: fixed;
+  top: 0; left: 0;
+  width: 22px; height: 22px;
+  margin: -4px 0 0 -6px;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate3d(-100px,-100px,0);
+  transition: opacity 0.2s ease;
+  opacity: 0;
+  filter: drop-shadow(0 3px 4px rgba(20,40,70,0.45));
+}
+.wii-cursor.active{ opacity: 1; }
+.wii-cursor-icon{
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: transform 0.1s ease;
+}
+.wii-cursor.pressed .wii-cursor-icon{ transform: scale(0.82); }
+
+/* ---------- 15. lite mode (auto, weak devices) ----------
+   same look, minus everything that costs paint time. the globe
+   keeps spinning because that runs on the compositor anyway. */
+body.lite::after{ display: none; }
+.lite .heart{ display: none; }
+.lite .bubbles span{ box-shadow: none; }
+.lite .chrome-text{
+  animation: pop-in 0.9s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  background-position: 35% 50%;
+}
+.lite .brand-orb, .lite .title-orb{ animation: none; }
+.lite .channel + .channel::before{ animation: none; }
+.lite .globe-bg{ filter: none; }
+.lite .glass-panel, .lite .wiibar-inner{ backdrop-filter: none; }
+.lite .hero-monitor{ animation: none; filter: drop-shadow(0 8px 12px rgba(20,40,80,0.3)); }
+.lite .player-glow{ animation: none; opacity: 0.6; }
+.lite .eq-bars span{ animation: none; }
+.lite .radio-screen::before{ animation: none; }
+.lite .scroll-hint{ animation: fade-in 0.8s 0.85s ease backwards; }
+.lite .marquee-track{ animation-duration: 16s; }
+/* stronger low-end path: kill every blur + soften shadows + drop the
+   heaviest decoration so weak/old GPUs render a clean, flat version */
+.lite *{ backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.lite .globe-glow{ display: none; }
+.lite .bubbles span:nth-child(n+3){ display: none; }
+.lite .glass-panel, .lite .card, .lite .project-card, .lite .mc-panel{
+  box-shadow: 0 3px 10px rgba(30,90,110,0.12);
+}
+.lite .monitor, .lite .hero-monitor{ filter: none; }
+/* lite skips the big about backdrop photo entirely (paint + 190K) */
+.lite #about{
+  background-image: linear-gradient(180deg, rgba(214,217,251,0.95), rgba(139,199,238,0.9) 60%, rgba(120,180,215,0.95));
+}
+.lite .net-packet{ display: none; }
+.lite .player-wrap.playing .radio{ animation: none; }
+
+/* ---------- 16. responsive ---------- */
+@media (max-width: 900px){
+  .globe-wrap{ opacity: 0.9; width: 560px; height: 560px; right: -150px; }
+  .globe-glow{ opacity: 0.7; width: 680px; height: 680px; right: -190px; }
+  .card-grid, .setup-grid, .project-grid{ grid-template-columns: 1fr; }
+  .wii-cursor{ display: none; }
+  body, a, button, .tab, .btn, .project-card{ cursor: auto; }
+}
+
+@media (max-width: 700px){
+  /* the bar stops being sticky on phones and every tab wraps into
+     view — nothing hides off screen, nothing eats scroll space */
+  .wiibar{
+    position: static;
+    padding: 10px max(12px, env(safe-area-inset-left)) 10px max(12px, env(safe-area-inset-right));
+  }
+  .wiibar-inner{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    border-radius: 22px;
+    padding: 10px 12px;
+    backdrop-filter: none;
+  }
+  .brand{ justify-content: center; font-size: 1.1rem; }
+  .tabs{ flex-wrap: wrap; justify-content: center; }
+  /* fingers, not wiimotes: everything tappable gets taller here */
+  .tab{ padding: 14px 15px; font-size: 0.8rem; }
+
+  .channel{ padding: 30px 14px; scroll-margin-top: 16px; }
+  .hero{ min-height: 64vh; min-height: 64svh; }
+  .hero-monitor{ display: none; }
+  .hero-content{ padding: 30px 20px; }
+  .chrome-text{ font-size: clamp(1.9rem, 10vw, 2.7rem); }
+  .subtitle{ font-size: 0.9rem; }
+  .btn{ padding: 14px 20px; font-size: 0.88rem; }
+  .btn-lg{ padding: 15px 26px; font-size: 0.92rem; }
+  .scroll-hint{ margin-top: 22px; }
+
+  .glass-panel{ padding: 20px 18px; border-radius: 20px; backdrop-filter: none; }
+  .section-title{ font-size: clamp(1.3rem, 5.5vw, 1.6rem); }
+  .stat-num{ font-size: 1.25rem; }
+  .terminal-body{ font-size: 0.7rem; }
+  .terminal-topbar{ margin: -4px -6px 10px; }
+  .setup-grid{ gap: 18px; }
+
+  .player-wrap{ max-width: 100%; }
+  .radio{ padding: 14px 14px 16px; }
+  .btn-play{ width: 52px; height: 52px; }
+  .station-pill{ padding: 14px 17px; font-size: 0.8rem; }
+  .vol input{ width: 140px; height: 28px; background:
+    linear-gradient(90deg, #8bc7ee, #8b6df0) center / 100% 8px no-repeat; }
+  .vol input::-webkit-slider-thumb{ width: 24px; height: 24px; }
+  .vol input::-moz-range-thumb{ width: 24px; height: 24px; }
+  .eq-row{ height: 40px; }
+  .eq-bars span{ width: 7px; }
+
+  .globe-wrap{ width: 380px; height: 380px; right: -120px; }
+  .globe-bg{ filter: none; background-image: url('../assets/img/globe-glass-sm.webp'); }
+  #about{
+    background-image:
+      linear-gradient(180deg, rgba(214,217,251,0.82), rgba(139,199,238,0.75) 60%, rgba(120,180,215,0.82)),
+      url('../assets/img/about-vista-sm.webp');
+  }
+
+  .clock-time{ font-size: 2rem; }
+  .pop-field{ height: 240px; }
+  .shrine-grid{ grid-template-columns: repeat(2, 1fr); }
+  .shrine-grid img{ height: 110px; }
+
+  .bubbles span:nth-child(n+7){ display: none; }
+  .heart:nth-child(n+5){ display: none; }
+}
+
+@media (max-width: 480px){
+  body::after{ display: none; }
+  .globe-wrap{ width: 330px; height: 330px; right: -110px; }
+  .globe-glow{ display: none; }
+}
+
+/* ------------------------------------------------
+   the setup — network diagram
+   ------------------------------------------------ */
+.net-panel{ padding: 24px 26px; }
+.net-diagram{
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+.net-node{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 14px 10px;
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+.net-ico{ font-size: 1.5rem; }
+.net-node strong{ font-family: var(--font-display); font-weight: 600; }
+.net-desc{ font-size: 0.78rem; color: var(--text-mid); line-height: 1.4; }
+.net-link{
+  position: relative;
+  align-self: center;
+  width: 88px;
+  height: 52px;
+  flex: 0 0 auto;
+  z-index: 1;
+}
+.net-link::before{
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 17px;
+  height: 3px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(43,168,224,0.15), rgba(43,168,224,0.65), rgba(43,168,224,0.15));
+}
+/* little packets commuting between the boxes */
+.net-packet{
+  position: absolute;
+  top: 12px; left: 0;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--aero-blue) 70%);
+  box-shadow: 0 0 8px rgba(43,168,224,0.8);
+  animation: packet-go 2.6s ease-in-out infinite;
+}
+.net-link + .net-node + .net-link .net-packet{ animation-delay: 1.3s; }
+@keyframes packet-go{
+  0%{ transform: translateX(0); opacity: 0; }
+  14%{ opacity: 1; }
+  86%{ opacity: 1; }
+  100%{ transform: translateX(75px); opacity: 0; }
+}
+.net-label{
+  position: absolute;
+  top: 26px; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  white-space: nowrap;
+  color: var(--text-mid);
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(255,255,255,0.9);
+  padding: 2px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(30,90,110,0.12);
+}
+.setup-cards{ grid-template-columns: 1fr 1fr; margin-top: 20px; }
+
+/* phone: the three boxes read as a compact stacked list (icon + label on
+   one row) joined by short vertical hops, instead of three big centered
+   cards with horizontal stubs floating between them. lives here, after the
+   base rules above, so it actually wins the cascade. */
+@media (max-width: 700px){
+  .net-panel{ padding: 16px 16px; }
+  .net-diagram{ flex-direction: column; gap: 0; }
+  .net-node{
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+  }
+  .net-ico{ font-size: 1.5rem; flex-shrink: 0; }
+  .net-node strong{ min-width: 78px; }
+  .net-desc{ font-size: 0.72rem; }
+  .net-link{
+    width: 2px;
+    height: 20px;
+    align-self: center;
+    z-index: 0;
+  }
+  .net-link::before{
+    left: 50%; right: auto; top: 0; bottom: 0;
+    width: 2px; height: auto;
+    transform: translateX(-50%);
+    background: linear-gradient(180deg, rgba(43,168,224,0.55), rgba(43,168,224,0.15));
+  }
+  .net-packet, .net-label{ display: none; }  /* commuting dots + labels just clutter at this size */
+  .setup-cards{ grid-template-columns: 1fr; }
+}
+
+/* mc extras: motd banner + mod chips */
+.mc-motd{
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-align: center;
+  font-size: 1.02rem;
+  letter-spacing: 1.5px;
+  background: linear-gradient(90deg, #e169d8, #8b5ce8, #e169d8);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.55));
+  animation: chrome-flow 7s ease-in-out infinite;
+}
+.lite .mc-motd{ animation: none; }
+.mc-tags{ margin-top: 10px; flex-wrap: wrap; }
+.mc-tags .tag-perf{
+  background: rgba(111,209,140,0.18);
+  color: #257c45;
+}
+
+/* bonus: the "lately" list */
+.lately-list{
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  color: var(--text-mid);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+}
+.lately-list li{ padding-left: 20px; position: relative; }
+.lately-list li::before{
+  content: "";
+  position: absolute;
+  left: 2px; top: 0.4em;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--aero-blue) 70%);
+  box-shadow: 0 0 6px rgba(43,168,224,0.6);
+}
+
+/* bonus: wide shrine banner */
+.shrine-wide{
+  display: block;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 6px 16px rgba(30,90,110,0.18);
+  margin-bottom: 12px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.shrine-wide img{ display: block; width: 100%; height: auto; }
+.shrine-wide:hover{ transform: scale(1.01); box-shadow: 0 12px 26px rgba(43,168,224,0.35); }
+
+/* the radio body breathes with the music (compositor-only) */
+@keyframes radio-pump{
+  0%, 100%{ transform: scale(1); }
+  50%{ transform: scale(1.006); }
+}
+.player-wrap.playing .radio{ animation: radio-pump 0.952s ease-in-out infinite; }
+
+/* ------------------------------------------------
+   the rice corner — dusk zone, gold accent
+   ------------------------------------------------ */
+/* it's night down here: titles go light, and a few faint stars sit in the
+   sky. static gradients only — the stars never animate, they just exist. */
+#rice{
+  position: relative;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,244,214,0.8), transparent 100%),
+    radial-gradient(1px 1px at 31% 64%, rgba(255,244,214,0.5), transparent 100%),
+    radial-gradient(2px 2px at 48% 25%, rgba(255,244,214,0.65), transparent 100%),
+    radial-gradient(1px 1px at 63% 51%, rgba(255,244,214,0.45), transparent 100%),
+    radial-gradient(1.5px 1.5px at 78% 14%, rgba(255,244,214,0.7), transparent 100%),
+    radial-gradient(1px 1px at 89% 42%, rgba(255,244,214,0.5), transparent 100%),
+    radial-gradient(2px 2px at 21% 82%, rgba(255,244,214,0.4), transparent 100%),
+    radial-gradient(1px 1px at 71% 88%, rgba(255,244,214,0.5), transparent 100%);
+}
+/* warm lamp-glow behind the panel */
+#rice::before{
+  content: "";
+  position: absolute;
+  left: 50%; top: 55%;
+  width: min(80vw, 900px); height: 70%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center, rgba(242,169,80,0.16), transparent 65%);
+  pointer-events: none;
+}
+#rice .section-title{ color: #f6eedd; }
+#rice .section-sub{ color: rgba(233,228,244,0.75); }
+.title-orb-gold{
+  background: radial-gradient(circle at 30% 30%, #fff, var(--aero-gold) 65%, var(--aero-gold-deep) 100%);
+  box-shadow: 0 0 10px rgba(242,169,80,0.65);
+}
+.rice-list{
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--font-display);
+  color: var(--text-mid);
+}
+.rice-list li{ padding-left: 22px; position: relative; line-height: 1.5; }
+.rice-list li::before{
+  content: "";
+  position: absolute;
+  left: 2px; top: 0.42em;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--aero-gold) 70%);
+  box-shadow: 0 0 7px rgba(242,169,80,0.7);
+}
+.rice-tags span{
+  background: rgba(242,169,80,0.16);
+  color: var(--aero-gold-deep);
+}
+
+/* ------------------------------------------------
+   minecraft server status
+   ------------------------------------------------ */
+.mc-panel{ padding: 22px 24px; display: flex; flex-direction: column; gap: 18px; }
+.mc-head{ display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mc-orb{
+  width: 18px; height: 18px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #b9c4cc 65%, #8a959d 100%);
+  box-shadow: 0 1px 4px rgba(30, 90, 110, 0.35);
+}
+.mc-orb.on{ background: radial-gradient(circle at 30% 30%, #fff, var(--aero-green) 65%, #2e9c56 100%); }
+.mc-orb.off{ background: radial-gradient(circle at 30% 30%, #fff, var(--aero-pink) 65%, #d6486f 100%); }
+.mc-state{ font-family: var(--font-display); font-size: 1.15rem; color: var(--text-dark); }
+.mc-count{ color: var(--text-mid); font-size: 0.95rem; }
+.mc-graph-wrap{ display: flex; flex-direction: column; gap: 6px; }
+.mc-graph-label{
+  display: flex; justify-content: space-between;
+  font-size: 0.85rem; color: var(--text-mid);
+}
+#mcGraph{
+  width: 100%; height: 120px; display: block;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+/* tps / tick / uptime strip under the graph */
+.mc-stats{ display: flex; gap: 10px; flex-wrap: wrap; }
+.mc-stat{
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid var(--glass-border);
+}
+.mc-stat-label{ font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-mid); }
+.mc-stat-val{ font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; color: var(--text-dark); }
+/* tps gets a health tint — green near 20, amber dipping, pink when it's hurting */
+.mc-stat-val.good{ color: #2e9c56; }
+.mc-stat-val.ok{ color: #c98a2b; }
+.mc-stat-val.bad{ color: #d6486f; }
+
+.mc-players{ display: flex; flex-wrap: wrap; gap: 10px; }
+.mc-player{
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-border);
+  font-size: 0.9rem; color: var(--text-dark);
+  box-shadow: var(--shadow-soft);
+}
+/* chips pop in when someone joins, shrink out when they leave */
+.mc-player.enter{ animation: chip-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.mc-player.leave{ animation: chip-out 0.26s ease forwards; }
+@keyframes chip-in{ from{ opacity: 0; transform: scale(0.6) translateY(6px); } }
+@keyframes chip-out{ to{ opacity: 0; transform: scale(0.6); } }
+.mc-player .mc-flag{ font-size: 1.05rem; }
+.mc-player .mc-country{ color: var(--text-mid); font-size: 0.82rem; }
+.mc-empty{ color: var(--text-mid); font-size: 0.9rem; }
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html{ scroll-behavior: auto; }
+  .reveal{ opacity: 1; translate: none; transition: none; }
+  /* the globe is a slow decorative spin on the compositor — keep it
+     turning even under reduce-motion so it never looks frozen */
+  .globe-bg{
+    animation-duration: 90s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
