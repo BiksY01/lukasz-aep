@@ -321,6 +321,10 @@
             <span class="project-goto" aria-hidden="true">open <svg class="li-arrow"><use href="#aero-arrow"/></svg></span>
           </a>
         </div>
+
+        <!-- Renders inside a shadow root, so its styling and this page's cannot
+             reach each other. See js/veil-widget.js. -->
+        <veil-widget></veil-widget>
       </div>
     </section>
 
@@ -551,5 +555,6 @@
   <script src="js/script.js" defer></script>
   <script src="js/radio.js" defer></script>
   <script src="js/mc-status.js" defer></script>
+  <script src="js/veil-widget.js" defer></script>
 </body>
 </html>

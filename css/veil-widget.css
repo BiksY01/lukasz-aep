@@ -1,0 +1,224 @@
+/* Styles for the Veil widget's shadow root.
+   Loaded as a stylesheet rather than injected as a <style> tag on purpose: the
+   site's CSP is style-src 'self' with no unsafe-inline, and keeping it that way
+   is worth more than the convenience.
+
+   The idea: the outer edge belongs to this site — glass, soft, warm-lit. Moving
+   inward it becomes the other thing — graphite, violet, monospaced. The boundary
+   is a gradient, not a border, so it reads as one object rather than a panel with
+   something else pasted into it. */
+
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
+.shell {
+  /* Aero's own language, borrowed rather than approximated. */
+  position: relative;
+  border-radius: 22px;
+  padding: 3px;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.92),
+    rgba(43, 168, 224, 0.45) 45%,
+    rgba(139, 109, 240, 0.5)
+  );
+  box-shadow:
+    0 10px 30px rgba(30, 90, 110, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+}
+
+/* The transition itself. Light glass at the rim, near-black by the middle. */
+.core {
+  position: relative;
+  border-radius: 19px;
+  padding: 26px 24px 22px;
+  background:
+    radial-gradient(
+      120% 100% at 50% -20%,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(146, 190, 214, 0.28) 22%,
+      rgba(24, 22, 34, 0.94) 62%,
+      #121019 100%
+    );
+  color: #d8d5e4;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", monospace;
+  overflow: hidden;
+}
+
+/* A slow sweep across the boundary, so the two worlds feel joined rather than
+   stacked. Transform only — it stays on the compositor. */
+.core::after {
+  content: "";
+  position: absolute;
+  inset: -40% -10%;
+  background: linear-gradient(
+    100deg,
+    transparent 42%,
+    rgba(167, 139, 250, 0.13) 50%,
+    transparent 58%
+  );
+  transform: translateX(-30%);
+  animation: drift 9s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  to {
+    transform: translateX(30%);
+  }
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  /* Still half in the glass, so it keeps the site's ink colour. */
+  color: #2c5566;
+}
+
+.title {
+  margin: 0 0 10px;
+  font-family: "Fredoka", "Trebuchet MS", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #0f2b36;
+}
+
+.line {
+  margin: 0 0 18px;
+  max-width: 46ch;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #b9b4cc;
+}
+
+.line strong {
+  color: #e7e4f2;
+  font-weight: 600;
+}
+
+.readout {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.readout li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  color: #9a95ad;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6ee7b7;
+  box-shadow: 0 0 8px rgba(110, 231, 183, 0.65);
+}
+
+.dot--warn {
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+}
+
+.dot--off {
+  background: #4a4459;
+  box-shadow: none;
+}
+
+.verdict {
+  font-variant-numeric: tabular-nums;
+  color: #cfcadd;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.cta {
+  display: inline-block;
+  padding: 10px 18px;
+  border: 1px solid rgba(167, 139, 250, 0.55);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #8b5cf6, #6d3fd4);
+  color: #fff;
+  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s;
+}
+
+.cta:hover,
+.cta:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.4);
+}
+
+.cta:focus-visible {
+  outline: 2px solid #a78bfa;
+  outline-offset: 3px;
+}
+
+.platforms {
+  display: flex;
+  gap: 6px;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.platform {
+  padding: 3px 8px;
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  border-radius: 999px;
+  color: #a49eb8;
+}
+
+.platform--soon {
+  border-style: dashed;
+  color: #8b85a0;
+}
+
+.footnote {
+  margin: 16px 0 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: #8f89a3;
+}
+
+@container (max-width: 380px) {
+  .core {
+    padding: 22px 18px 18px;
+  }
+  .title {
+    font-size: 1.28rem;
+  }
+}
+
+/* Reduce the motion, keep the identity — the gradient boundary is the point of
+   the thing, so it stays. Only the sweep stops. */
+@media (prefers-reduced-motion: reduce) {
+  .core::after {
+    animation: none;
+    transform: none;
+  }
+  .cta {
+    transition: none;
+  }
+}
