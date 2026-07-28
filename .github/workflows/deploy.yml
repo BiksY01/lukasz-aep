@@ -1,0 +1,52 @@
+name: deploy
+
+# Why this exists: there was never any auto-deploy on this project. Deploys only
+# ever happened when deploy.sh was run by hand on the desktop, which is why the
+# site silently fell behind the repo. Pushing to main now builds and ships.
+#
+# Production is a push to main. Every other branch gets a preview URL, so a change
+# can be looked at before it replaces the live site.
+#
+# BEFORE THIS WORKS, two things are needed — see DEPLOY.md:
+#   1. CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the repo secrets.
+#   2. build.sh, _headers and functions/ committed. They are gitignored today,
+#      which is the second reason a CI build could never have worked.
+
+# Manual-only until the build files below are committed. Flip this to `push:` the
+# moment they are, and every push to main goes live.
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 24
+
+      - name: build dist/
+        run: bash build.sh
+
+      - name: deploy
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy dist
+            --project-name=lukasz-aep
+            --branch=${{ github.ref_name }}
+            --commit-dirty=true
+
+      # The failure that started all this was a silent one. This makes sure the
+      # next one is not.
+      - name: say so if it broke
+        if: failure()
+        run: |
+          echo "::error::deploy failed on ${{ github.ref_name }} — the live site is unchanged"
