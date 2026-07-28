@@ -1874,3 +1874,17 @@ img.gh-avatar:not([src]){ display: none; }
   box-shadow: inset 0 -1px 2px rgba(0,0,0,0.25);
 }
 .muted{ opacity: 0.65; }
+
+/* ---------- veil widget slot ----------
+   The widget renders inside a shadow root, so nothing in here can style its
+   insides — this only positions the box on the page. It sat flush against the
+   project grid before, which read as two things colliding rather than one
+   section. */
+.veil-widget-slot{
+  margin-top: 34px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255,255,255,0.35);
+}
+@media (max-width: 700px){
+  .veil-widget-slot{ margin-top: 24px; padding-top: 22px; }
+}
