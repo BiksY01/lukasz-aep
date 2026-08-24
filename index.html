@@ -313,11 +313,13 @@
           </a>
         </div>
 
-        <!-- Renders inside a shadow root, so its styling and this page's cannot
-             reach each other. See js/veil-widget.js. This replaced a project card that
-             said the same thing worse; do not add both back. -->
-        <div class="veil-widget-slot">
+        <!-- Both render inside shadow roots, so their styling and this page's
+             cannot reach each other. See js/veil-widget.js and js/audio1-widget.js.
+             Each one replaced a project card that said the same thing worse; do
+             not add those cards back. -->
+        <div class="widget-row">
           <veil-widget></veil-widget>
+          <audio1-widget></audio1-widget>
         </div>
       </div>
     </section>
@@ -550,5 +552,6 @@
   <script src="js/radio.js" defer></script>
   <script src="js/mc-status.js" defer></script>
   <script src="js/veil-widget.js" defer></script>
+  <script src="js/audio1-widget.js" defer></script>
 </body>
 </html>

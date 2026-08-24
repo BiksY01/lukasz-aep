@@ -11,6 +11,8 @@
 :host {
   display: block;
   container-type: inline-size;
+  /* fills the grid cell so the pair keeps a level bottom edge */
+  height: 100%;
 }
 
 .shell {
@@ -33,6 +35,9 @@
 /* The transition itself. Light glass at the rim, near-black by the middle. */
 .core {
   position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   border-radius: 19px;
   padding: 26px 24px 22px;
   background:
@@ -196,6 +201,7 @@
 }
 
 .footnote {
+  margin-top: auto;
   margin: 16px 0 0;
   font-size: 0.7rem;
   line-height: 1.5;

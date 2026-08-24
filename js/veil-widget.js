@@ -14,9 +14,7 @@
 (() => {
   "use strict";
 
-  // Placeholder until the real domain exists. The ref parameter is first-party
-  // and exists so the click-through can be counted without a tracker.
-  const VEIL_URL = "https://veil-app.pages.dev/?ref=aero";
+  const VEIL_URL = "https://veilapp.pages.dev/?ref=veil-widget";
 
   /* Must stay in step with support-matrix.json in the Veil repo, which is the
      only place platform support is actually declared. macOS and Android were

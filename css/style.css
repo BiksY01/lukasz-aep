@@ -413,6 +413,14 @@ main{ position: relative; z-index: 1; }
   align-items: center;
   padding: 46px 20px;
   scroll-margin-top: 84px;
+  /* Skip rendering sections that are off screen. This page carries 21 infinite
+     animations and 8 backdrop-filters, and without this the browser keeps
+     compositing every one of them the whole time you are anywhere on the page,
+     not just when they are visible. On a GPU already under load that is what
+     the lag actually is. The intrinsic size keeps the scrollbar honest so
+     nothing jumps as sections come into range. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
 }
 .channel-inner{
   max-width: 1040px;
@@ -439,7 +447,9 @@ main{ position: relative; z-index: 1; }
 }
 
 /* don't render channels that are off screen */
-#kernel, #projects, #vault, #setup, #server, #playing, #rice, #tiktok{ content-visibility: auto; }
+/* content-visibility now lives on .channel, with the intrinsic size this
+   ID list never had. An off-screen section measured 0 without it and the
+   scrollbar jumped every time one came into range. */
 #vault{ contain-intrinsic-size: auto 640px; }
 #rice{ contain-intrinsic-size: auto 620px; }
 #kernel{ contain-intrinsic-size: auto 1250px; }
@@ -1880,11 +1890,26 @@ img.gh-avatar:not([src]){ display: none; }
    insides — this only positions the box on the page. It sat flush against the
    project grid before, which read as two things colliding rather than one
    section. */
-.veil-widget-slot{
+.widget-row{
   margin-top: 34px;
   padding-top: 30px;
   border-top: 1px solid rgba(255,255,255,0.35);
+  display: grid;
+  gap: 22px;
+  /* two up while there is room for both to keep their own identity, one column
+     the moment there is not. each widget sizes its own insides off a container
+     query, so they do not need to agree on a width. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* stretch, not start: the two widgets are a pair and a ragged bottom edge
+     makes them read as unrelated. each one fills its cell and its own insides
+     push the shorter one out to match. */
+  align-items: stretch;
+}
+.widget-row > veil-widget,
+.widget-row > audio1-widget{ height: 100%; }
+@media (max-width: 860px){
+  .widget-row{ grid-template-columns: 1fr; }
 }
 @media (max-width: 700px){
-  .veil-widget-slot{ margin-top: 24px; padding-top: 22px; }
+  .widget-row{ margin-top: 24px; padding-top: 22px; gap: 18px; }
 }

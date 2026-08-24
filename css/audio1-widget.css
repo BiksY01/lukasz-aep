@@ -1,0 +1,171 @@
+/* Styles for the AUDIO 1 widget's shadow root.
+   A stylesheet rather than an injected <style> for the same reason as the Veil
+   one: CSP here is style-src 'self' with no unsafe-inline.
+
+   Same idea as its neighbour, different destination. The rim is this site's
+   glass; moving inward it becomes AUDIO 1 — warm near-black, chalk type, one
+   red accent. The boundary is a gradient so it reads as one object rather than
+   a screenshot pasted into a panel. */
+
+:host {
+  display: block;
+  container-type: inline-size;
+  /* fills the grid cell so the pair keeps a level bottom edge */
+  height: 100%;
+}
+
+.shell {
+  position: relative;
+  height: 100%;
+  display: flex;
+  border-radius: 22px;
+  padding: 3px;
+  /* aero glass at the rim, but warmed toward the thing it opens */
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.92),
+    rgba(214, 160, 120, 0.42) 45%,
+    rgba(214, 92, 82, 0.5)
+  );
+  box-shadow:
+    0 10px 30px rgba(70, 40, 30, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+}
+
+.core {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 19px;
+  padding: 26px 24px 22px;
+  background:
+    radial-gradient(
+      120% 100% at 50% -20%,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(190, 158, 126, 0.42) 22%,
+      rgba(31, 26, 20, 0.95) 62%,
+      #17130e 100%
+    );
+  color: #ede5d6;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", monospace;
+  overflow: hidden;
+}
+
+/* slow sweep across the boundary so the two worlds feel joined, not stacked.
+   transform only, stays on the compositor */
+.core::after {
+  content: "";
+  position: absolute;
+  inset: -40% -10%;
+  background: linear-gradient(
+    100deg,
+    transparent 42%,
+    rgba(255, 236, 214, 0.07) 50%,
+    transparent 58%
+  );
+  transform: translateX(-60%);
+  animation: sweep 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sweep {
+  0%, 100% { transform: translateX(-60%); }
+  50%      { transform: translateX(60%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .core::after { animation: none; opacity: .4; }
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  /* near-white with weight. this line lands in the gradient's mid-warm band,
+     where both a light-muted and a dark-brown tone disappeared. */
+  color: #f2ece1;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(23, 19, 14, .45);
+}
+
+.title {
+  margin: 0 0 12px;
+  font-family: Archivo, "Segoe UI", system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ede5d6;
+}
+
+.line {
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #c9bda9;
+}
+.line strong { color: #ede5d6; font-weight: 600; }
+
+.facts {
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.facts li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(237, 229, 214, 0.09);
+  padding-bottom: 7px;
+}
+.facts .k { color: #a89a86; letter-spacing: 0.04em; }
+.facts .v {
+  margin-left: auto;
+  color: #ede5d6;
+  font-size: 15px;
+  font-weight: 700;
+}
+.facts li:last-child .v { color: #d65c52; }
+
+.actions { display: flex; margin-top: auto; }
+
+/* mirrors the footnote on the Veil card so the pair keeps a common baseline */
+.footnote {
+  margin: 16px 0 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #8d8172;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: #d65c52;
+  color: #17130e;
+  font-weight: 650;
+  font-size: 13px;
+  text-decoration: none;
+  transition: transform 160ms cubic-bezier(.22,1,.36,1), box-shadow 200ms ease;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0);
+}
+.cta:hover,
+.cta:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(214, 92, 82, 0.35);
+}
+.cta:focus-visible {
+  outline: 2px solid #ede5d6;
+  outline-offset: 2px;
+}
+.cta:active { transform: scale(.97); }
+
+@container (max-width: 340px) {
+  .core { padding: 20px 18px 18px; }
+  .title { font-size: 25px; }
+}
