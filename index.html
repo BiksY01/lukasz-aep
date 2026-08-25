@@ -230,47 +230,54 @@
           <div class="glass-panel">
             <h3>Compiled here, all of it WAW</h3>
             <p>
-              Gentoo builds from source, so basically nothing on this machine arrived
-              as somebody else's binary. 1259 packages, every one of them compiled
-              on this desk against this exact cpu.
+              gentoo builds everything from source, so almost nothing on this box
+              showed up as somebody else's binary. 1259 packages, all of them built
+              right here against this exact cpu.
             </p>
             <ul class="feature-list">
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>-march=native -O2 -pipe</code> — built for a 9800X3D, portable to nothing &lt;3</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>-march=native -O2 -pipe</code>, so it runs great here and would probably explode anywhere else &lt;3</li>
               <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>desktop/plasma</code> profile, gcc 15.3.0</li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>OpenRC, no systemd. shell scripts i can actually read</li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>USE flags decide what gets compiled IN, so unused features never ship</li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>a big update is a couple of hours of fans. that's the rent</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>openrc, no systemd. i can read the init scripts, that's the whole reason</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>USE flags pick what gets compiled in, so stuff i don't use never gets built</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>a big update is two hours of fan noise. that's the deal you sign lol</li>
             </ul>
           </div>
           <div class="glass-panel">
             <h3>The kernel: distribution, on purpose</h3>
             <p>
-              I run <code>gentoo-kernel</code> — still compiled from source locally, just
-              configured by people smarter than me. I keep <code>gentoo-sources</code>
-              around for poking at, but it isn't what boots.
+              i run <code>gentoo-kernel</code>. still compiled here, just configured
+              by people who know more than me. <code>gentoo-sources</code> is installed
+              for poking at but it's not what boots.
             </p>
             <p>
-              Hand-rolling a <code>.config</code> sounds cooler right up until the nvidia
-              module. it lives outside the tree and has to be rebuilt against every
-              single kernel bump, and a custom config turns each bump into a debugging
-              night instead of a reboot. i'd rather spend that time on things that
-              aren't yak shaving xD
+              hand-rolling a config sounds way cooler until nvidia. that module sits
+              outside the tree and has to be rebuilt every single kernel bump, and a
+              custom config turns each one into a whole evening. i'd rather do
+              literally anything else xD
             </p>
           </div>
           <div class="glass-panel">
             <h3>What it actually taught me</h3>
             <p>
-              The useful lessons weren't the compiling. they were the times it broke:
+              none of the useful stuff came from compiling. it came from breaking it:
             </p>
             <ul class="feature-list">
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>a box with no syslog can't tell you why it froze. i ran without one for
-                months and every crash was a mystery until i fixed that</li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>vm.swappiness=180</code> is a tuning for machines with no ram. on 30GB it
-                just churns zram for nothing</li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>MAKEOPTS="-j16"</code> with <code>--jobs=4</code> is 64 compilers at once. that
-                is how you OOM your own desktop mid-update lol</li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>a black screen usually isn't the gpu dying, it's the desktop shell
-                having died and nothing bothering to restart it</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>a box with no syslog can't tell you anything about why it froze. i went months like that debugging the same freeze over and over</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>vm.swappiness=180</code> is advice for machines with no ram. i have 30GB. it was just churning zram for fun</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>-j16</code> and <code>--jobs=4</code> is 64 compilers at the same time, which is a great way to OOM your own desktop mid-update lol</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>black screen is almost never the gpu. it's plasmashell dying and nothing bringing it back</li>
+            </ul>
+          </div>
+          <div class="glass-panel">
+            <h3>The other machines</h3>
+            <p>
+              gentoo is the daily driver but it isn't the only thing running here.
+            </p>
+            <ul class="feature-list">
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>the thinkpad runs <strong>xubuntu</strong>. it's old and it has 6GB, so xfce over kde every time — plasma on that thing is just cruel</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>the server is plain <strong>ubuntu</strong>. boring on purpose. it has one job and i don't want it to be interesting</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>debian and arch in vms when i'm testing something i don't want near the real install</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>funny how the more i tune gentoo the more i appreciate the ubuntu box just booting every time</li>
             </ul>
           </div>
         </div>
@@ -370,6 +377,19 @@
               very lazy of me &lt;3
             </p>
             <div class="tags"><span>obsidian</span><span>syncthing</span><span>claude</span></div>
+          </div>
+          <div class="glass-panel">
+            <h3>the rules it runs on</h3>
+            <p>
+              the ai side isn't just "chat with it". there's a layer of my own rules
+              underneath that i keep adding to whenever it gets something wrong.
+            </p>
+            <ul class="feature-list">
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>every message gets rewritten into a proper brief before the model sees it. i type four words, it gets a paragraph</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>the memory is files in the vault, synced across all three machines, so it doesn't matter which one i'm sat at</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>when it gets something wrong i write the correction down as a rule, so the same mistake doesn't come back next week</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>hooks block it from finishing while work's still owed, which is very rude and very effective lol</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -566,9 +586,9 @@
           <div class="glass-panel">
             <h3>current rice</h3>
             <ul class="rice-list">
-              <li>kde plasma on x11, breeze mixed with the <strong>Sweet</strong> theme</li>
-              <li>colloid icons (purple, obviously) + bibata ice cursors</li>
-              <li>animated wallpapers — wallpaper engine's linux port, plus xwinwrap for the stubborn stuff</li>
+              <li>kde plasma on x11, breeze <strong>dark</strong> with a custom <strong>MonoRice</strong> colour scheme</li>
+              <li>went full monochrome — Win11-black-dark icons, plain breeze cursors. the purple era is over, it was very purple for a while &lt;3</li>
+              <li>animated wallpapers through xwinwrap, which is held together with hope</li>
               <li>fastfetch tuned until the output looked right, then never touched again lol</li>
             </ul>
           </div>
@@ -579,7 +599,7 @@
               their best. most of the ricing energy goes into making all three feel like
               one coherent setup instead of three random screens xD
             </p>
-            <div class="tags rice-tags"><span>kde</span><span>x11</span><span>sweet</span><span>280hz</span></div>
+            <div class="tags rice-tags"><span>kde</span><span>x11</span><span>mono</span><span>280hz</span></div>
           </div>
         </div>
       </div>

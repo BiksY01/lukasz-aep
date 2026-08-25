@@ -75,7 +75,8 @@
         "Reads what your machine is actually giving away — ",
         strong("dns, tunnel, firewall, ipv6, disk"),
         " — tells you plainly which ones are open, and gives you the exact " +
-          "commands to close them."
+          "commands to close them. it has a licence layer now too, which was a lot " +
+          "less fun to build than the part that does the real work."
       );
       return p;
     }
