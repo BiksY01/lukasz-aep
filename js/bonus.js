@@ -242,7 +242,7 @@
 (() => {
   const uptimeNum = document.getElementById('uptimeNum');
   if (!uptimeNum) return;
-  const REBOOT_AT = new Date('2026-07-18T12:35:20');
+  const REBOOT_AT = new Date('2026-08-25T01:36:00');
   const tick = () => {
     const days = Math.floor((Date.now() - REBOOT_AT) / 86400000);
     uptimeNum.textContent = days;
