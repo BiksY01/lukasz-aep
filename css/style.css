@@ -1594,7 +1594,11 @@ body.lite::after{ display: none; }
   /* fingers, not wiimotes: everything tappable gets taller here */
   .tab{ padding: 14px 15px; font-size: 0.8rem; }
 
-  .channel{ padding: 30px 14px; scroll-margin-top: 16px; }
+  /* 14px put the section titles' hanging orb 14px off a 390px screen's edge.
+     The orb hangs by design, so the gutter moves rather than the orb. This is
+     the rule that actually applies on a phone — the 900px block above it sets
+     the same property and loses. */
+  .channel{ padding: 30px 22px; scroll-margin-top: 16px; }
   .hero{ min-height: 64vh; min-height: 64svh; }
   .hero-monitor{ display: none; }
   .hero-content{ padding: 30px 20px; }
