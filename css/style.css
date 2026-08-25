@@ -894,12 +894,47 @@ code{
 #rice .glass-panel{ --panel-edge: rgba(242,169,80,0.35); }
 
 /* ---------- 11. radio ---------- */
+/* the radio used to sit alone in the middle of the section, which looked like
+   a placeholder. the note beside it is narrower on purpose — off-centre reads
+   as arranged, dead-centre reads as default */
+.radio-row{
+  display: grid;
+  grid-template-columns: minmax(0, 540px) minmax(0, 330px);
+  gap: 30px;
+  align-items: start;
+  justify-content: center;
+}
 .player-wrap{
   position: relative;
   max-width: 540px;
-  margin: 0 auto;
   padding: 10px 0 20px;
 }
+/* sits a touch low on purpose — level with the radio's screen, not its lid */
+.synth-note{ margin-top: 34px; }
+.synth-note h3{ margin-bottom: 10px; }
+.synth-note p{ font-size: 0.94rem; line-height: 1.65; }
+/* the panel sits over the bright globe, so these rules are darker than the
+   usual white hairlines — white on white reads as nothing here */
+.synth-specs{
+  margin: 14px 0;
+  border-top: 1px solid rgba(28,61,74,0.18);
+}
+.synth-specs > div{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(28,61,74,0.12);
+  font-size: 0.88rem;
+}
+.synth-specs dt{ color: var(--text-mid); }
+.synth-specs dd{
+  font-family: var(--font-mono, monospace);
+  color: var(--text-dark);
+  font-weight: 600;
+  text-align: right;
+}
+.synth-tail{ opacity: 0.78; }
 .player-glow{
   position: absolute;
   inset: -6% 2%;
@@ -1171,10 +1206,43 @@ code{
 
 /* ---------- 12. tiktok ---------- */
 .tiktok-inner{ display: flex; justify-content: center; }
-.tiktok-card{ max-width: 520px; text-align: center; }
+/* was a dead-centre card with a button under it, which is the shape every
+   template ships. split it instead, and let the two halves be uneven */
+.tiktok-card{
+  max-width: 840px;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 34px;
+  align-items: start;
+}
+.tiktok-lead .btn{ margin-top: 18px; }
+.tiktok-reel{
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  align-self: center;
+}
+.tiktok-reel li{
+  padding: 9px 0 9px 20px;
+  position: relative;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  opacity: 0.85;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+.tiktok-reel li:last-child{ border-bottom: 0; }
+.tiktok-reel li::before{
+  content: "";
+  position: absolute;
+  left: 0; top: 1.05em;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--aero-pink);
+  box-shadow: 0 0 8px rgba(255,111,165,0.6);
+}
 .tiktok-orb{
   width: 42px; height: 42px;
-  margin: 0 auto 4px;
+  margin: 0 0 4px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #fff, var(--aero-pink) 65%, #df3d78 100%);
   box-shadow: 0 0 14px rgba(255,111,165,0.55);
@@ -1484,6 +1552,9 @@ body.lite::after{ display: none; }
   .globe-wrap{ opacity: 0.9; width: 560px; height: 560px; right: -150px; }
   .globe-glow{ opacity: 0.7; width: 680px; height: 680px; right: -190px; }
   .card-grid, .setup-grid, .project-grid{ grid-template-columns: 1fr; }
+  .radio-row{ grid-template-columns: minmax(0, 540px); }
+  .synth-note{ align-self: auto; margin-bottom: 0; }
+  .tiktok-card{ grid-template-columns: 1fr; gap: 20px; }
   .wii-cursor{ display: none; }
   body, a, button, .tab, .btn, .project-card{ cursor: auto; }
 }
