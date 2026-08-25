@@ -227,29 +227,50 @@
         </h2>
         <div class="card-grid">
           <div class="glass-panel">
-            <h3>Built from source, on purpose WAW</h3>
+            <h3>Compiled here, all of it WAW</h3>
             <p>
-              No binary kernels here. I pull the sources straight from
-              <code>/usr/src/linux</code>, run <code>make menuconfig</code>, and hand-pick every
-              driver and subsystem my hardware actually needs — nothing more.
+              Gentoo builds from source, so basically nothing on this machine arrived
+              as somebody else's binary. 1259 packages, every one of them compiled
+              on this desk against this exact cpu.
             </p>
             <ul class="feature-list">
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>Custom <code>.config</code> tuned specifically for my CPU and devices</li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>Stripped of modules and drivers I'll never touch (firewire LOL &lt;3) </li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>Compiled with <code>-march=native -O2</code> in <code>make.conf</code></li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>OpenRC init for a lean, transparent boot</li>
-              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>Rebuilt on every major kernel bump</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>-march=native -O2 -pipe</code> — built for a 9800X3D, portable to nothing &lt;3</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>desktop/plasma</code> profile, gcc 15.3.0</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>OpenRC, no systemd. shell scripts i can actually read</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>USE flags decide what gets compiled IN, so unused features never ship</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>a big update is a couple of hours of fans. that's the rent</li>
             </ul>
           </div>
           <div class="glass-panel">
-            <h3>Why? uhhh</h3>
+            <h3>The kernel: distribution, on purpose</h3>
             <p>
-              Faster boots, a smaller attack surface very opsec yes. Daily usage of the system helps me be better at linux in general,
-              while I can enjoy the smooth and snappy feel of it all.
+              I run <code>gentoo-kernel</code> — still compiled from source locally, just
+              configured by people smarter than me. I keep <code>gentoo-sources</code>
+              around for poking at, but it isn't what boots.
             </p>
             <p>
-              Gentoo isn't the easy path, speaking from experience xD
+              Hand-rolling a <code>.config</code> sounds cooler right up until the nvidia
+              module. it lives outside the tree and has to be rebuilt against every
+              single kernel bump, and a custom config turns each bump into a debugging
+              night instead of a reboot. i'd rather spend that time on things that
+              aren't yak shaving xD
             </p>
+          </div>
+          <div class="glass-panel">
+            <h3>What it actually taught me</h3>
+            <p>
+              The useful lessons weren't the compiling. they were the times it broke:
+            </p>
+            <ul class="feature-list">
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>a box with no syslog can't tell you why it froze. i ran without one for
+                months and every crash was a mystery until i fixed that</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>vm.swappiness=180</code> is a tuning for machines with no ram. on 30GB it
+                just churns zram for nothing</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>MAKEOPTS="-j16"</code> with <code>--jobs=4</code> is 64 compilers at once. that
+                is how you OOM your own desktop mid-update lol</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>a black screen usually isn't the gpu dying, it's the desktop shell
+                having died and nothing bothering to restart it</li>
+            </ul>
           </div>
         </div>
 
@@ -271,11 +292,11 @@
             </div>
             <pre class="terminal-body"><span class="t-prompt">biksy@localhost ~ $</span> fastfetch
 <span class="t-key">OS</span>       <span class="t-val">Gentoo Linux x86_64</span>
-<span class="t-key">Kernel</span>   <span class="t-val">Linux 6.18.37-gentoo-r1-gentoo-dist</span>
-<span class="t-key">WM</span>       <span class="t-val">KWin (Wayland)</span>
+<span class="t-key">Kernel</span>   <span class="t-val">Linux 6.18.39-gentoo-dist</span>
+<span class="t-key">WM</span>       <span class="t-val">KWin (X11)</span>
 <span class="t-key">CPU</span>      <span class="t-val">AMD Ryzen 7 9800X3D (16) @ 5.27GHz</span>
 <span class="t-key">GPU</span>      <span class="t-val">NVIDIA GeForce RTX 5070 [Discrete]</span>
-<span class="t-key">Packages</span> <span class="t-val">1114 (emerge), 8 (flatpak)</span>
+<span class="t-key">Packages</span> <span class="t-val">1259 (emerge), 17 (flatpak)</span>
 <span class="t-prompt">biksy@localhost ~ $</span> <span class="t-cursor">▌</span></pre>
           </div>
         </div>
@@ -365,7 +386,7 @@
             <div class="net-node">
               <svg class="net-ico" aria-hidden="true"><use href="#aero-monitor"/></svg>
               <strong>gentoo box</strong>
-              <span class="net-desc">9800X3D · RTX 5070<br>kde wayland · openrc</span>
+              <span class="net-desc">9800X3D · RTX 5070<br>kde on x11 · openrc</span>
             </div>
             <div class="net-link" aria-hidden="true"><span class="net-packet"></span><span class="net-label">nfs · syncthing</span></div>
             <div class="net-node">
@@ -507,7 +528,7 @@
           <div class="glass-panel">
             <h3>current rice</h3>
             <ul class="rice-list">
-              <li>kde plasma on wayland, breeze mixed with the <strong>Sweet</strong> theme</li>
+              <li>kde plasma on x11, breeze mixed with the <strong>Sweet</strong> theme</li>
               <li>colloid icons (purple, obviously) + bibata ice cursors</li>
               <li>animated wallpapers — wallpaper engine's linux port, plus xwinwrap for the stubborn stuff</li>
               <li>fastfetch tuned until the output looked right, then never touched again lol</li>
@@ -520,7 +541,7 @@
               their best. most of the ricing energy goes into making all three feel like
               one coherent setup instead of three random screens xD
             </p>
-            <div class="tags rice-tags"><span>kde</span><span>wayland</span><span>sweet</span><span>280hz</span></div>
+            <div class="tags rice-tags"><span>kde</span><span>x11</span><span>sweet</span><span>280hz</span></div>
           </div>
         </div>
       </div>
