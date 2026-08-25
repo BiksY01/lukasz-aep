@@ -894,45 +894,56 @@ code{
 #rice .glass-panel{ --panel-edge: rgba(242,169,80,0.35); }
 
 /* ---------- 11. radio ---------- */
-/* the radio used to sit alone in the middle of the section, which looked like
-   a placeholder. the note beside it is narrower on purpose — off-centre reads
-   as arranged, dead-centre reads as default */
+/* Radio centred, note directly below it at the SAME width. The previous version
+   put the note in a narrow column beside the radio, where a 330px sidebar ran
+   taller than the 339px radio it was annotating — the note dwarfed its subject
+   and the two edges lined up with nothing. Stacking them at one width means
+   there is exactly one vertical axis in this section instead of two competing
+   ones, which is what he asked for. */
 .radio-row{
-  display: grid;
-  grid-template-columns: minmax(0, 540px) minmax(0, 330px);
-  gap: 30px;
-  align-items: start;
-  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
 }
 .player-wrap{
   position: relative;
+  width: 100%;
   max-width: 540px;
-  padding: 10px 0 20px;
+  padding: 10px 0 4px;
 }
-/* sits a touch low on purpose — level with the radio's screen, not its lid */
-.synth-note{ margin-top: 34px; }
-.synth-note h3{ margin-bottom: 10px; }
-.synth-note p{ font-size: 0.94rem; line-height: 1.65; }
-/* the panel sits over the bright globe, so these rules are darker than the
-   usual white hairlines — white on white reads as nothing here */
+.synth-note{ width: 100%; max-width: 540px; }
+.synth-note h3{ margin-bottom: 8px; }
+.synth-note p{ font-size: 0.94rem; line-height: 1.6; }
+/* HORIZONTAL, not a stacked list — the vertical version was what made the note
+   tall enough to overpower the radio. Three specs side by side read as a strip
+   of readings off a device, which is also what they are.
+   Rules are darker than the usual white hairlines because this panel sits over
+   the bright globe, where white on white reads as nothing. */
 .synth-specs{
-  margin: 14px 0;
+  display: flex;
+  margin: 14px 0 12px;
   border-top: 1px solid rgba(28,61,74,0.18);
+  border-bottom: 1px solid rgba(28,61,74,0.12);
 }
 .synth-specs > div{
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(28,61,74,0.12);
-  font-size: 0.88rem;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  min-width: 0;
 }
-.synth-specs dt{ color: var(--text-mid); }
+.synth-specs > div + div{ border-left: 1px solid rgba(28,61,74,0.12); }
+.synth-specs dt{ color: var(--text-mid); font-size: 0.76rem; }
 .synth-specs dd{
   font-family: var(--font-mono, monospace);
   color: var(--text-dark);
   font-weight: 600;
-  text-align: right;
+  font-size: 0.82rem;
+  /* "Am · F · C · G" broke over two lines and "pad · bass · arp" over three,
+     which made a strip meant to read as one row of readings look like a list */
+  white-space: nowrap;
 }
 .synth-tail{ opacity: 0.78; }
 .player-glow{
@@ -1552,8 +1563,12 @@ body.lite::after{ display: none; }
   .globe-wrap{ opacity: 0.9; width: 560px; height: 560px; right: -150px; }
   .globe-glow{ opacity: 0.7; width: 680px; height: 680px; right: -190px; }
   .card-grid, .setup-grid, .project-grid{ grid-template-columns: 1fr; }
-  .radio-row{ grid-template-columns: minmax(0, 540px); }
-  .synth-note{ align-self: auto; margin-bottom: 0; }
+  /* .radio-row is a centred column at every width now, so it needs no override.
+     The specs strip is the only thing that has to change: three columns at
+     0.88rem inside a 340px phone would set 8-character words on two lines each. */
+  .synth-specs{ flex-direction: column; }
+  .synth-specs > div{ flex-direction: row; justify-content: space-between; padding: 8px 12px; }
+  .synth-specs > div + div{ border-left: 0; border-top: 1px solid rgba(28,61,74,0.12); }
   .tiktok-card{ grid-template-columns: 1fr; gap: 20px; }
   .wii-cursor{ display: none; }
   body, a, button, .tab, .btn, .project-card{ cursor: auto; }
