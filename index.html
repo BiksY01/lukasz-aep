@@ -147,6 +147,7 @@
         <a href="#projects" class="tab" data-tab="projects">Projects</a>
         <a href="#setup" class="tab" data-tab="setup">Setup</a>
         <a href="#server" class="tab" data-tab="server">Server</a>
+        <a href="#gaming" class="tab" data-tab="gaming">Gaming</a>
         <a href="#playing" class="tab" data-tab="playing">Now Playing</a>
         <a href="#rice" class="tab" data-tab="rice">Rice</a>
         <a href="#tiktok" class="tab" data-tab="tiktok">TikTok</a>
@@ -473,6 +474,43 @@
               <span class="tag-perf">ferritecore</span><span class="tag-perf">saturn</span><span class="tag-perf">clumps</span>
               <span class="tag-perf">mobtimizations</span><span class="tag-perf">spark</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- GAMING — the linux half nobody writes about -->
+    <section id="gaming" class="channel">
+      <div class="channel-inner">
+        <h2 class="section-title"><span class="title-orb title-orb-green"></span>Gaming on Linux</h2>
+        <p class="section-sub">wheels, headsets, and the traps nobody warns you about</p>
+        <div class="card-grid">
+          <div class="glass-panel">
+            <h3>Sim racing, eventually</h3>
+            <p>
+              a g29 wheel and assetto corsa. both took a fight, and neither failure
+              said anything useful about what was actually wrong xD
+            </p>
+            <ul class="feature-list">
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>the wheel showed up in <code>lsusb</code> with <strong>no input device at all</strong>. usbguard was blocking it silently — it enumerates, then dies. check <code>usbguard list-devices --blocked</code> before debugging anything else</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>in ps4 mode you get <strong>zero force feedback</strong>. ps3 mode is the one that actually works</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><code>new-lg4ff</code> over the in-tree driver took it from 3 force effects to 15 &lt;3</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>custom shaders patch dies on wine 10+ — W^X means a page can't be writable and executable, and CSP patches the game at runtime. <strong>GE-Proton9-20</strong> is the last one that works</li>
+            </ul>
+          </div>
+          <div class="glass-panel">
+            <h3>VR, the streaming way</h3>
+            <p>
+              quest 3, no cable, running against a native openxr runtime instead of
+              steamvr. minecraft in vr with real render distance is the payoff.
+            </p>
+            <ul class="feature-list">
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg><strong>wivrn</strong> — monado underneath, so it's a real openxr runtime and not a translation layer</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>alvr + steamvr is a <strong>dead end on nvidia</strong>: it can't DRM-lease the display, on x11 and wayland both. wivrn dodges it by streaming from a render target instead</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>vivecraft for minecraft, with serverside LOD so far terrain streams in instead of the client scanning the world</li>
+              <li><svg class="li-arrow"><use href="#aero-arrow"/></svg>the lesson both times: the error message points at the wrong layer, basically always</li>
+            </ul>
           </div>
         </div>
       </div>

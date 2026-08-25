@@ -331,10 +331,11 @@ body::after{
 }
 .tab{
   font-family: var(--font-display);
-  font-size: 0.88rem;
+  font-size: min(0.88rem, 16.6px); /* capped: the nav is pinned near 1009px at any
+     viewport, but rem grows with it, so past ~1440 the tabs outgrew their own bar */
   text-decoration: none;
   color: var(--text-mid);
-  padding: 9px 15px;
+  padding: 9px 14px; /* 14 not 15: eleven tabs overflowed a 1009px nav by 21px, and 11x2 edges x 1px buys back 22 */
   border-radius: 9px;
   background: rgba(255,255,255,0.4);
   border: 1px solid transparent;
